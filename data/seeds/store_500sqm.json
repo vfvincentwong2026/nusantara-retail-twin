@@ -1,0 +1,471 @@
+{
+  "meta": {
+    "seed_version": "0.1",
+    "generated_at": "2026-10-14T08:00:00+07:00",
+    "store_size_sqm": 500,
+    "store_format": "minimarket",
+    "island_region": "java",
+    "source": "nrt seed --store-size 500 --region java"
+  },
+
+  "store_profile": {
+    "store_id": "st-500-java-001",
+    "store_name": "雅加达 Kemang 社区店",
+    "store_size_sqm": 500,
+    "store_format": "minimarket",
+    "island_region": "java",
+    "city": "Jakarta",
+    "latitude": -6.2607,
+    "longitude": 106.8136,
+    "target_sku_count": 5000,
+    "sku_density": 10.0,
+    "fresh_ratio": 0.18,
+    "shelf_layers": 5,
+    "aisle_width_m": 2.0,
+    "qris_enabled": true,
+    "supply_hub_distance_km": 12.5,
+    "lead_time_variance_days": 1.0,
+    "mudik_offset": -7
+  },
+
+  "zones": [
+    {
+      "zone_id": "zn-500-001",
+      "zone_name": "入口与促销区",
+      "zone_type": "ambient",
+      "heat_value": 0.72,
+      "polygon": [
+        { "x": 0.0, "y": 0.0 },
+        { "x": 20.0, "y": 0.0 },
+        { "x": 20.0, "y": 6.0 },
+        { "x": 0.0, "y": 6.0 }
+      ]
+    },
+    {
+      "zone_id": "zn-500-002",
+      "zone_name": "饮料与零食区",
+      "zone_type": "ambient",
+      "heat_value": 0.88,
+      "polygon": [
+        { "x": 0.0, "y": 6.0 },
+        { "x": 20.0, "y": 6.0 },
+        { "x": 20.0, "y": 14.0 },
+        { "x": 0.0, "y": 14.0 }
+      ]
+    },
+    {
+      "zone_id": "zn-500-003",
+      "zone_name": "生鲜区",
+      "zone_type": "fresh",
+      "heat_value": 0.91,
+      "polygon": [
+        { "x": 0.0, "y": 14.0 },
+        { "x": 12.0, "y": 14.0 },
+        { "x": 12.0, "y": 22.0 },
+        { "x": 0.0, "y": 22.0 }
+      ]
+    },
+    {
+      "zone_id": "zn-500-004",
+      "zone_name": "日用与个护区",
+      "zone_type": "household",
+      "heat_value": 0.55,
+      "polygon": [
+        { "x": 12.0, "y": 14.0 },
+        { "x": 20.0, "y": 14.0 },
+        { "x": 20.0, "y": 22.0 },
+        { "x": 12.0, "y": 22.0 }
+      ]
+    },
+    {
+      "zone_id": "zn-500-005",
+      "zone_name": "收银与即食区",
+      "zone_type": "ambient",
+      "heat_value": 0.78,
+      "polygon": [
+        { "x": 0.0, "y": 22.0 },
+        { "x": 20.0, "y": 22.0 },
+        { "x": 20.0, "y": 25.0 },
+        { "x": 0.0, "y": 25.0 }
+      ]
+    }
+  ],
+
+  "fixtures": [
+    {
+      "fixture_id": "fx-500-001",
+      "zone_id": "zn-500-001",
+      "fixture_type": "gondola",
+      "fixture_label": "F-001",
+      "position_x": 3.0,
+      "position_y": 3.0,
+      "length_m": 3.0,
+      "height_m": 1.6,
+      "rotation_deg": 0
+    },
+    {
+      "fixture_id": "fx-500-002",
+      "zone_id": "zn-500-002",
+      "fixture_type": "gondola",
+      "fixture_label": "F-002",
+      "position_x": 3.0,
+      "position_y": 10.0,
+      "length_m": 4.0,
+      "height_m": 1.8,
+      "rotation_deg": 0
+    },
+    {
+      "fixture_id": "fx-500-003",
+      "zone_id": "zn-500-002",
+      "fixture_type": "gondola",
+      "fixture_label": "F-003",
+      "position_x": 13.0,
+      "position_y": 10.0,
+      "length_m": 4.0,
+      "height_m": 1.8,
+      "rotation_deg": 0
+    },
+    {
+      "fixture_id": "fx-500-004",
+      "zone_id": "zn-500-003",
+      "fixture_type": "cooler",
+      "fixture_label": "C-001",
+      "position_x": 3.0,
+      "position_y": 18.0,
+      "length_m": 3.0,
+      "height_m": 1.9,
+      "rotation_deg": 0
+    },
+    {
+      "fixture_id": "fx-500-005",
+      "zone_id": "zn-500-004",
+      "fixture_type": "shelf",
+      "fixture_label": "F-004",
+      "position_x": 15.0,
+      "position_y": 18.0,
+      "length_m": 3.0,
+      "height_m": 2.0,
+      "rotation_deg": 90
+    },
+    {
+      "fixture_id": "fx-500-006",
+      "zone_id": "zn-500-005",
+      "fixture_type": "shelf",
+      "fixture_label": "F-005",
+      "position_x": 5.0,
+      "position_y": 23.5,
+      "length_m": 3.0,
+      "height_m": 1.5,
+      "rotation_deg": 0
+    }
+  ],
+
+  "shelf_levels": [
+    {
+      "shelf_level_id": "sl-500-001-1",
+      "fixture_id": "fx-500-001",
+      "level_number": 1,
+      "height_from_floor_m": 0.15,
+      "is_eye_level": false
+    },
+    {
+      "shelf_level_id": "sl-500-001-2",
+      "fixture_id": "fx-500-001",
+      "level_number": 2,
+      "height_from_floor_m": 0.55,
+      "is_eye_level": false
+    },
+    {
+      "shelf_level_id": "sl-500-001-3",
+      "fixture_id": "fx-500-001",
+      "level_number": 3,
+      "height_from_floor_m": 0.95,
+      "is_eye_level": true
+    },
+    {
+      "shelf_level_id": "sl-500-001-4",
+      "fixture_id": "fx-500-001",
+      "level_number": 4,
+      "height_from_floor_m": 1.35,
+      "is_eye_level": false
+    },
+    {
+      "shelf_level_id": "sl-500-002-1",
+      "fixture_id": "fx-500-002",
+      "level_number": 1,
+      "height_from_floor_m": 0.15,
+      "is_eye_level": false
+    },
+    {
+      "shelf_level_id": "sl-500-002-2",
+      "fixture_id": "fx-500-002",
+      "level_number": 2,
+      "height_from_floor_m": 0.55,
+      "is_eye_level": false
+    },
+    {
+      "shelf_level_id": "sl-500-002-3",
+      "fixture_id": "fx-500-002",
+      "level_number": 3,
+      "height_from_floor_m": 0.95,
+      "is_eye_level": true
+    },
+    {
+      "shelf_level_id": "sl-500-002-4",
+      "fixture_id": "fx-500-002",
+      "level_number": 4,
+      "height_from_floor_m": 1.35,
+      "is_eye_level": false
+    },
+    {
+      "shelf_level_id": "sl-500-002-5",
+      "fixture_id": "fx-500-002",
+      "level_number": 5,
+      "height_from_floor_m": 1.65,
+      "is_eye_level": false
+    }
+  ],
+
+  "sample_facings": [
+    {
+      "facing_id": "fc-500-001-1-01",
+      "shelf_level_id": "sl-500-001-1",
+      "facing_index": 1,
+      "facing_width_m": 0.12,
+      "max_units": 24,
+      "sku_code": "SKU-IDM-GRG-85",
+      "planogram_version": 1
+    },
+    {
+      "facing_id": "fc-500-001-1-02",
+      "shelf_level_id": "sl-500-001-1",
+      "facing_index": 2,
+      "facing_width_m": 0.12,
+      "max_units": 24,
+      "sku_code": "SKU-IDM-KRG-85",
+      "planogram_version": 1
+    },
+    {
+      "facing_id": "fc-500-001-2-01",
+      "shelf_level_id": "sl-500-001-2",
+      "facing_index": 1,
+      "facing_width_m": 0.12,
+      "max_units": 20,
+      "sku_code": "SKU-TRP-SRD-155",
+      "planogram_version": 1
+    },
+    {
+      "facing_id": "fc-500-002-3-01",
+      "shelf_level_id": "sl-500-002-3",
+      "facing_index": 1,
+      "facing_width_m": 0.13,
+      "max_units": 18,
+      "sku_code": "SKU-AQU-600",
+      "planogram_version": 1
+    },
+    {
+      "facing_id": "fc-500-002-3-02",
+      "shelf_level_id": "sl-500-002-3",
+      "facing_index": 2,
+      "facing_width_m": 0.13,
+      "max_units": 18,
+      "sku_code": "SKU-TEH-PCS-350",
+      "planogram_version": 1
+    }
+  ],
+
+  "sample_skus": [
+    {
+      "sku_id": "sku-001",
+      "sku_code": "SKU-IDM-GRG-85",
+      "sku_name": "Indomie Goreng 85g",
+      "category_name": "方便面",
+      "subcategory": "油炸方便面",
+      "brand": "Indomie",
+      "unit_price": 3500,
+      "unit_cost": 2800,
+      "gross_margin": 0.20,
+      "shelf_life_days": 180,
+      "fresh_flag": false,
+      "halal_certified": true,
+      "local_content_ratio": 0.95,
+      "mudik_sensitive": true,
+      "abc_class": "A"
+    },
+    {
+      "sku_id": "sku-002",
+      "sku_code": "SKU-IDM-KRG-85",
+      "sku_name": "Indomie Kari Ayam 85g",
+      "category_name": "方便面",
+      "subcategory": "油炸方便面",
+      "brand": "Indomie",
+      "unit_price": 3500,
+      "unit_cost": 2800,
+      "gross_margin": 0.20,
+      "shelf_life_days": 180,
+      "fresh_flag": false,
+      "halal_certified": true,
+      "local_content_ratio": 0.95,
+      "mudik_sensitive": true,
+      "abc_class": "A"
+    },
+    {
+      "sku_id": "sku-003",
+      "sku_code": "SKU-TRP-SRD-155",
+      "sku_name": "Tropicana Slim Sardines 155g",
+      "category_name": "罐头食品",
+      "subcategory": "鱼罐头",
+      "brand": "Tropicana Slim",
+      "unit_price": 18500,
+      "unit_cost": 14200,
+      "gross_margin": 0.23,
+      "shelf_life_days": 730,
+      "fresh_flag": false,
+      "halal_certified": true,
+      "local_content_ratio": 0.60,
+      "mudik_sensitive": false,
+      "abc_class": "B"
+    },
+    {
+      "sku_id": "sku-004",
+      "sku_code": "SKU-AQU-600",
+      "sku_name": "Aqua Mineral 600ml",
+      "category_name": "饮料",
+      "subcategory": "瓶装水",
+      "brand": "Aqua",
+      "unit_price": 4000,
+      "unit_cost": 2600,
+      "gross_margin": 0.35,
+      "shelf_life_days": 365,
+      "fresh_flag": false,
+      "halal_certified": true,
+      "local_content_ratio": 1.0,
+      "mudik_sensitive": true,
+      "abc_class": "A"
+    },
+    {
+      "sku_id": "sku-005",
+      "sku_code": "SKU-TEH-PCS-350",
+      "sku_name": "Teh Pucuk Harum 350ml",
+      "category_name": "饮料",
+      "subcategory": "茶饮料",
+      "brand": "Teh Pucuk",
+      "unit_price": 5000,
+      "unit_cost": 3200,
+      "gross_margin": 0.36,
+      "shelf_life_days": 270,
+      "fresh_flag": false,
+      "halal_certified": true,
+      "local_content_ratio": 1.0,
+      "mudik_sensitive": true,
+      "abc_class": "A"
+    },
+    {
+      "sku_id": "sku-006",
+      "sku_code": "SKU-BRS-BSR-5KG",
+      "sku_name": "Beras Premium 5kg",
+      "category_name": "主食",
+      "subcategory": "大米",
+      "brand": "Beras Lokal",
+      "unit_price": 68000,
+      "unit_cost": 58000,
+      "gross_margin": 0.15,
+      "shelf_life_days": 365,
+      "fresh_flag": false,
+      "halal_certified": true,
+      "local_content_ratio": 1.0,
+      "mudik_sensitive": true,
+      "abc_class": "A"
+    },
+    {
+      "sku_id": "sku-007",
+      "sku_code": "SKU-AYM-FRS-1KG",
+      "sku_name": "Ayam Fresh 1kg",
+      "category_name": "生鲜",
+      "subcategory": "禽肉",
+      "brand": "Fresh Local",
+      "unit_price": 42000,
+      "unit_cost": 35000,
+      "gross_margin": 0.17,
+      "shelf_life_days": 3,
+      "fresh_flag": true,
+      "halal_certified": true,
+      "local_content_ratio": 1.0,
+      "mudik_sensitive": false,
+      "abc_class": "A"
+    },
+    {
+      "sku_id": "sku-008",
+      "sku_code": "SKU-SYR-BAY-500",
+      "sku_name": "Bayam Segar 500g",
+      "category_name": "生鲜",
+      "subcategory": "叶菜",
+      "brand": "Fresh Local",
+      "unit_price": 12000,
+      "unit_cost": 9500,
+      "gross_margin": 0.21,
+      "shelf_life_days": 3,
+      "fresh_flag": true,
+      "halal_certified": true,
+      "local_content_ratio": 1.0,
+      "mudik_sensitive": false,
+      "abc_class": "B"
+    },
+    {
+      "sku_id": "sku-009",
+      "sku_code": "SKU-SBN-ALF-1L",
+      "sku_name": "Sunsilk Shampoo 1L",
+      "category_name": "个护",
+      "subcategory": "洗发水",
+      "brand": "Sunsilk",
+      "unit_price": 58000,
+      "unit_cost": 42000,
+      "gross_margin": 0.28,
+      "shelf_life_days": 1095,
+      "fresh_flag": false,
+      "halal_certified": true,
+      "local_content_ratio": 0.55,
+      "mudik_sensitive": false,
+      "abc_class": "B"
+    },
+    {
+      "sku_id": "sku-010",
+      "sku_code": "SKU-PPR-BTL-500",
+      "sku_name": "Pepsodent 500g",
+      "category_name": "个护",
+      "subcategory": "牙膏",
+      "brand": "Pepsodent",
+      "unit_price": 32000,
+      "unit_cost": 23000,
+      "gross_margin": 0.28,
+      "shelf_life_days": 1095,
+      "fresh_flag": false,
+      "halal_certified": true,
+      "local_content_ratio": 0.45,
+      "mudik_sensitive": false,
+      "abc_class": "B"
+    }
+  ],
+
+  "ramadan_calendar_2026": {
+    "ramadan_start": "2026-02-19",
+    "lebaran_date": "2026-03-20",
+    "peak_date": "2026-03-13",
+    "mudik_peak_date": "2026-03-17",
+    "pre_replenishment_windows": [
+      { "round": 1, "start": "2026-01-01", "end": "2026-01-15" },
+      { "round": 2, "start": "2026-02-19", "end": "2026-03-06" }
+    ]
+  },
+
+  "generation_summary": {
+    "zones_count": 5,
+    "fixtures_count": 6,
+    "shelf_levels_count": 24,
+    "facings_count": 1200,
+    "skus_count": 5000,
+    "fresh_skus_count": 900,
+    "halal_certified_skus_count": 4750,
+    "note": "sample_facings 与 sample_skus 仅展示前若干条，完整数据由 nrt seed 命令生成"
+  }
+}
