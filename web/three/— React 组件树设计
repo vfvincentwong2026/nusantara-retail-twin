@@ -1,0 +1,675 @@
+# web/three/ — React 组件树设计
+
+> 3D 数字孪生渲染层的组件架构、状态管理与数据流设计。
+> 版本：v0.1
+
+---
+
+## 1. 设计原则
+
+**单一数据源驱动**。2D 平面图与 3D 场景共享同一份 `SpatialDocument`。用户编辑平面图时，3D 视图自动同步；切换门店规模时，两者同时刷新。
+
+**空间为组件边界**。每个 `Zone`、`Fixture`、`Facing` 都是 React 组件，携带自己的业务状态（库存、缺货、临期）和视觉状态（颜色、高亮、动画）。
+
+**状态分层**。全局状态（门店、日历、WebSocket）用 Zustand；局部状态（相机、悬停、动画）留在组件内。
+
+**性能优先**。使用 `InstancedMesh` 渲染重复货架，`useFrame` 控制动画，`React.memo` + `useMemo` 避免重渲染。
+
+---
+
+## 2. 组件树总览
+
+```text
+<App>
+├── <AppProviders>                     # 全局 Provider 容器
+│   ├── <QueryClientProvider>          # TanStack Query
+│   ├── <WebSocketProvider>            # 实时数据流
+│   └── <I18nProvider>                 # 中/英切换
+│
+├── <Router>
+│   ├── <LandingPage>                  # 门店选择页
+│   │   └── <StoreScaleSelector>       # 三档门店卡片
+│   │
+│   └── <TwinPage>                     # 主视图
+│       ├── <TopBar>
+│       │   ├── <StoreInfoBadge>
+│       │   ├── <ScaleSwitcher>        # 500 / 2000 / 5000㎡
+│       │   ├── <MetricToggle>         # 热力图指标切换
+│       │   ├── <RamadanTimelineToggle>
+│       │   └── <LiveStatusPill>       # 实时联动 / 演示模拟
+│       │
+│       ├── <MainSplit>
+│       │   ├── <ViewportPanel>        # 左：3D / 2D 视图
+│       │   │   ├── <ViewModeTabs>     # 2D / 3D / 分屏
+│       │   │   ├── <FloorplanCanvas>  # 2D 平面图
+│       │   │   └── <ThreeCanvas>      # 3D 数字孪生
+│       │   │       └── <SceneRoot>
+│       │   │           ├── <SceneLights>
+│       │   │           ├── <SceneCamera>
+│       │   │           ├── <StoreFloor>
+│       │   │           ├── <ZoneLayer>
+│       │   │           ├── <FixtureLayer>
+│       │   │           ├── <FacingLayer>
+│       │   │           ├── <AgentLayer>          # 顾客/补货动画
+│       │   │           └── <OverlayLayer>        # 标签、告警气泡
+│       │   │
+│       │   └── <DetailPanel>          # 右：明细面板
+│       │       ├── <DetailTabs>       # 库存 / 预测 / 补货 / 舆情
+│       │       ├── <InventoryPanel>
+│       │       ├── <ForecastPanel>
+│       │       ├── <ReplenishmentPanel>
+│       │       └── <SentimentPanel>
+│       │
+│       ├── <BottomTimeline>           # 底部时间轴
+│       │   ├── <RamadanSlider>
+│       │   ├── <MudikIndicator>
+│       │   └── <DateLabel>
+│       │
+│       └── <SimulationDrawer>         # 底部抽屉（可折叠）
+│           ├── <SimulationControls>
+│           ├── <SimulationResultTable>
+│           └── <ReplenishAnimationController>
+│
+└── <GlobalOverlays>
+    ├── <ToastContainer>
+    ├── <AlertBanner>
+    └── <CommandPalette>               # Cmd+K
+```
+
+---
+
+## 3. 目录结构
+
+```text
+web/three/
+├── src/
+│   ├── App.tsx
+│   ├── main.tsx
+│   │
+│   ├── providers/
+│   │   ├── AppProviders.tsx
+│   │   ├── WebSocketProvider.tsx
+│   │   ├── QueryClientProvider.tsx
+│   │   └── I18nProvider.tsx
+│   │
+│   ├── pages/
+│   │   ├── LandingPage.tsx
+│   │   └── TwinPage.tsx
+│   │
+│   ├── layout/
+│   │   ├── TopBar.tsx
+│   │   ├── MainSplit.tsx
+│   │   ├── BottomTimeline.tsx
+│   │   └── SimulationDrawer.tsx
+│   │
+│   ├── three/
+│   │   ├── SceneRoot.tsx
+│   │   ├── SceneCamera.tsx
+│   │   ├── SceneLights.tsx
+│   │   ├── StoreFloor.tsx
+│   │   ├── zones/
+│   │   │   ├── ZoneLayer.tsx
+│   │   │   ├── ZoneMesh.tsx
+│   │   │   └── ZoneHeatmapOverlay.tsx
+│   │   ├── fixtures/
+│   │   │   ├── FixtureLayer.tsx
+│   │   │   ├── GondolaMesh.tsx
+│   │   │   ├── CoolerMesh.tsx
+│   │   │   ├── FreezerMesh.tsx
+│   │   │   ├── ProduceRackMesh.tsx
+│   │   │   └── CounterMesh.tsx
+│   │   ├── facings/
+│   │   │   ├── FacingLayer.tsx
+│   │   │   ├── FacingBox.tsx
+│   │   │   ├── FacingStatusColor.ts
+│   │   │   └── FacingLabel.tsx
+│   │   ├── agents/
+│   │   │   ├── AgentLayer.tsx
+│   │   │   ├── ReplenishAnimation.tsx
+│   │   │   └── CustomerFlowLine.tsx
+│   │   └── overlays/
+│   │       ├── OverlayLayer.tsx
+│   │       ├── AlertBubble.tsx
+│   │       └── HeatLegend.tsx
+│   │
+│   ├── floorplan/
+│   │   ├── FloorplanCanvas.tsx
+│   │   ├── FloorplanGrid.tsx
+│   │   ├── FloorplanZoneShape.tsx
+│   │   ├── FloorplanFixtureShape.tsx
+│   │   └── FloorplanToolbar.tsx
+│   │
+│   ├── panels/
+│   │   ├── DetailPanel.tsx
+│   │   ├── DetailTabs.tsx
+│   │   ├── InventoryPanel.tsx
+│   │   ├── ForecastPanel.tsx
+│   │   ├── ReplenishmentPanel.tsx
+│   │   └── SentimentPanel.tsx
+│   │
+│   ├── timeline/
+│   │   ├── RamadanSlider.tsx
+│   │   ├── MudikIndicator.tsx
+│   │   └── DateLabel.tsx
+│   │
+│   ├── simulation/
+│   │   ├── SimulationControls.tsx
+│   │   ├── SimulationResultTable.tsx
+│   │   └── ReplenishAnimationController.tsx
+│   │
+│   ├── stores/
+│   │   ├── useStoreStore.ts          # 当前门店状态
+│   │   ├── useSpatialStore.ts        # 空间数据
+│   │   ├── useSelectionStore.ts      # 选中对象
+│   │   ├── useMetricStore.ts         # 热力图指标
+│   │   ├── useTimelineStore.ts       # 时间轴状态
+│   │   └── useSimulationStore.ts     # 模拟状态
+│   │
+│   ├── hooks/
+│   │   ├── useSpatialData.ts
+│   │   ├── useFacings.ts
+│   │   ├── useHeatmap.ts
+│   │   ├── useForecast.ts
+│   │   ├── useReplenishStream.ts
+│   │   ├── useAgentFeed.ts
+│   │   └── useThreeCamera.ts
+│   │
+│   ├── api/
+│   │   ├── client.ts                 # Axios 实例
+│   │   ├── spatial.ts
+│   │   ├── inventory.ts
+│   │   ├── forecast.ts
+│   │   ├── replenish.ts
+│   │   └── calendar.ts
+│   │
+│   ├── types/
+│   │   ├── spatial.ts
+│   │   ├── inventory.ts
+│   │   ├── forecast.ts
+│   │   ├── replenish.ts
+│   │   └── calendar.ts
+│   │
+│   ├── i18n/
+│   │   ├── index.ts
+│   │   ├── zh.json
+│   │   └── en.json
+│   │
+│   └── utils/
+│       ├── color.ts
+│       ├── format.ts
+│       └── animation.ts
+│
+├── public/
+│   ├── models/                       # GLTF 模型
+│   │   ├── gondola.glb
+│   │   ├── cooler.glb
+│   │   └── shelf.glb
+│   └── textures/
+│
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
+```
+
+---
+
+## 4. 状态管理
+
+### 4.1 Zustand Store 设计
+
+**`useStoreStore`** — 当前门店与规模
+
+```typescript
+interface StoreState {
+  currentStore: StoreProfile | null;
+  currentScale: 500 | 2000 | 5000;
+  setStore: (store: StoreProfile) => void;
+  switchScale: (scale: 500 | 2000 | 5000) => void;
+  reset: () => void;
+}
+```
+
+**`useSpatialStore`** — 空间数据
+
+```typescript
+interface SpatialState {
+  spatial: SpatialDocument | null;
+  loading: boolean;
+  error: string | null;
+  loadSpatial: (storeId: string) => Promise<void>;
+  updateFacingSku: (facingId: string, skuId: string) => void;
+  planogramVersion: number;
+  bumpPlanogramVersion: () => void;
+}
+```
+
+**`useSelectionStore`** — 选中对象
+
+```typescript
+interface SelectionState {
+  selectedFacingId: string | null;
+  selectedFixtureId: string | null;
+  selectedZoneId: string | null;
+  hoveredFacingId: string | null;
+  selectFacing: (id: string | null) => void;
+  selectFixture: (id: string | null) => void;
+  selectZone: (id: string | null) => void;
+  hoverFacing: (id: string | null) => void;
+  clear: () => void;
+}
+```
+
+**`useMetricStore`** — 热力图指标
+
+```typescript
+type MetricType = 'turnover_rate' | 'gross_margin' | 'stockout_risk' | 'days_of_supply';
+
+interface MetricState {
+  metric: MetricType;
+  heatmapVisible: boolean;
+  legendRange: [number, number];
+  setMetric: (m: MetricType) => void;
+  toggleHeatmap: () => void;
+}
+```
+
+**`useTimelineStore`** — 时间轴
+
+```typescript
+interface TimelineState {
+  currentDate: string;               // YYYY-MM-DD
+  rangeStart: string;
+  rangeEnd: string;
+  ramadanWindowVisible: boolean;
+  setDate: (date: string) => void;
+  setRange: (start: string, end: string) => void;
+  toggleRamadanWindow: () => void;
+}
+```
+
+**`useSimulationStore`** — 补货模拟
+
+```typescript
+interface SimulationState {
+  isRunning: boolean;
+  strategy: 'reorder_point' | 'fefo' | 'ramadan_pre' | 'auto';
+  activeSimulationId: string | null;
+  results: SimulationResult | null;
+  runSimulation: (params: SimulationParams) => Promise<void>;
+  clearResults: () => void;
+}
+```
+
+### 4.2 状态分层原则
+
+| 层级 | 存储位置 | 示例 |
+|---|---|---|
+| 全局持久 | Zustand | 当前门店、选中对象、时间轴 |
+| 服务端缓存 | TanStack Query | 空间数据、Facings、预测 |
+| 实时流 | WebSocket + Zustand | 补货事件、告警 |
+| 局部 UI | React useState | 面板折叠、悬停、动画进度 |
+| Three.js | useRef / useFrame | 相机、动画 |
+
+---
+
+## 5. 核心组件契约
+
+### 5.1 `<SceneRoot>`
+
+**职责**：3D 场景根容器，装配所有图层。
+
+```typescript
+interface SceneRootProps {
+  spatial: SpatialDocument;
+  heatmap: HeatmapData | null;
+  metric: MetricType;
+  selectedFacingId: string | null;
+  onFacingClick: (facingId: string) => void;
+  onFacingHover: (facingId: string | null) => void;
+}
+```
+
+**渲染策略**：
+
+- `StoreFloor`：静态地面 + 网格
+- `ZoneLayer`：区域多边形，热力图叠加
+- `FixtureLayer`：使用 `InstancedMesh` 批量渲染同类型货架
+- `FacingLayer`：按需渲染（仅渲染视野内 + 选中/告警）
+
+### 5.2 `<FixtureLayer>`
+
+**职责**：按 `fixture_type` 分组，使用 `InstancedMesh` 渲染。
+
+```typescript
+interface FixtureLayerProps {
+  fixtures: Fixture[];
+  selectedFixtureId: string | null;
+  onFixtureClick: (id: string) => void;
+}
+```
+
+**实现要点**：
+
+```typescript
+const groups = useMemo(() => {
+  return fixtures.reduce((acc, f) => {
+    (acc[f.fixture_type] ??= []).push(f);
+    return acc;
+  }, {} as Record<string, Fixture[]>);
+}, [fixtures]);
+
+return (
+  <>
+    {Object.entries(groups).map(([type, items]) => (
+      <InstancedFixtures key={type} type={type} items={items} />
+    ))}
+  </>
+);
+```
+
+### 5.3 `<FacingBox>`
+
+**职责**：单个 Facings 的 3D 表示，携带状态颜色。
+
+```typescript
+interface FacingBoxProps {
+  facing: Facing;
+  position: [number, number, number];
+  status: FacingStatus;
+  quantity: number;
+  maxUnits: number;
+  isSelected: boolean;
+  isHovered: boolean;
+  onClick: () => void;
+  onHover: (hovering: boolean) => void;
+}
+```
+
+**视觉映射**：
+
+| status | 颜色 | 说明 |
+|---|---|---|
+| `normal` | `#475569` | 常态灰 |
+| `low` | `#F59E0B` | 低库存黄 |
+| `critical` | `#EF4444` | 告警红 |
+| `empty` | `#991B1B` | 缺货深红 |
+| `overstock` | `#3B82F6` | 超量蓝 |
+| `expiring` | `#F97316` | 临期橙 |
+
+**填充比例**：`fill_ratio = quantity / max_units`，用货架内的高亮柱体表示。
+
+### 5.4 `<RamadanSlider>`
+
+**职责**：时间轴滑块，驱动斋月窗口可视化。
+
+```typescript
+interface RamadanSliderProps {
+  rangeStart: string;              // 2026-01-01
+  rangeEnd: string;                // 2026-04-03
+  ramadanStart: string;            // 2026-02-19
+  lebaranDate: string;             // 2026-03-21
+  currentDate: string;
+  mudikOffsetDays: number;
+  onChange: (date: string) => void;
+}
+```
+
+**交互行为**：
+
+- 拖动滑块 → 更新 `currentDate` → 触发预测数据刷新
+- 斋月区间用色带标记（浅绿）
+- Mudik 峰值日（2026-03-18）用红色竖线标记
+- 开斋节（2026-03-21）用金色竖线标记
+
+### 5.5 `<ReplenishAnimationController>`
+
+**职责**：消费 WebSocket 补货事件，驱动 3D 动画。
+
+```typescript
+interface ReplenishAnimation {
+  facingId: string;
+  fromQuantity: number;
+  toQuantity: number;
+  durationMs: number;
+  fromPosition: [number, number, number];
+  toPosition: [number, number, number];
+}
+
+function ReplenishAnimationController() {
+  const { lastEvent } = useReplenishStream();
+  const [animations, setAnimations] = useState<ReplenishAnimation[]>([]);
+
+  useEffect(() => {
+    if (lastEvent?.event === 'replenish_update') {
+      const anims = lastEvent.updates.map(convertToAnimation);
+      setAnimations(anims);
+      setTimeout(() => setAnimations([]), 1500);
+    }
+  }, [lastEvent]);
+
+  return (
+    <>
+      {animations.map((anim) => (
+        <ReplenishFlyingIcon key={anim.facingId} {...anim} />
+      ))}
+    </>
+  );
+}
+```
+
+---
+
+## 6. 数据流
+
+### 6.1 首次加载
+
+```text
+[App 挂载]
+    │
+    ▼
+[useStoreStore] 加载默认门店（2000㎡ Java）
+    │
+    ▼
+[useSpatialData] GET /api/v1/stores/{id}/spatial
+    │
+    ▼
+[useSpatialStore] 写入 spatial 数据
+    │
+    ├──→ [ThreeCanvas] 渲染 3D 场景
+    ├──→ [FloorplanCanvas] 渲染 2D 平面图
+    └──→ [useFacings] GET /facings 并行加载库存
+```
+
+### 6.2 切换热力图指标
+
+```text
+[用户点击 MetricToggle]
+    │
+    ▼
+[useMetricStore.setMetric('turnover_rate')]
+    │
+    ▼
+[useHeatmap] GET /heatmap?metric=turnover_rate
+    │
+    ▼
+[ZoneLayer / FacingLayer] 颜色重算
+```
+
+### 6.3 触发补货模拟
+
+```text
+[用户点击"模拟补货"]
+    │
+    ▼
+[useSimulationStore.runSimulation()]
+    │
+    ▼
+POST /api/v1/stores/{id}/replenish/simulate
+    │
+    ▼
+[SSE / WebSocket] 流式返回补货事件
+    │
+    ▼
+[ReplenishAnimationController] 播放补货动画
+    │
+    ▼
+[FacingBox] 更新数量与状态
+```
+
+### 6.4 时间轴拖动
+
+```text
+[用户拖动 RamadanSlider]
+    │
+    ▼
+[useTimelineStore.setDate('2026-03-13')]
+    │
+    ▼
+[useForecast] GET /forecast/ramadan?year=2026
+    │
+    ▼
+[ForecastPanel] 更新曲线
+    │
+    ▼
+[FacingLayer] 节庆品类高亮
+```
+
+---
+
+## 7. 性能优化策略
+
+### 7.1 渲染优化
+
+| 策略 | 应用场景 | 实现 |
+|---|---|---|
+| `InstancedMesh` | 货架批量渲染 | 同类型货架合并为一个 draw call |
+| `React.memo` | FacingBox / FixtureMesh | 仅在 props 变化时重渲染 |
+| `useMemo` | 数据分组、颜色计算 | 避免每次渲染重算 |
+| 视锥剔除 | 大场景 | Three.js 自动 |
+| LOD | 远景货架 | 使用简化模型 |
+| 按需渲染 | Facings | 仅渲染视野内 + 选中/告警 |
+
+### 7.2 状态更新优化
+
+- **Zustand selector**：组件只订阅需要的字段
+- **`shallow` 比较**：避免数组/对象引用变化触发重渲染
+- **批量更新**：WebSocket 事件合并到 100ms 窗口内统一更新
+
+### 7.3 网络优化
+
+| 接口 | 策略 |
+|---|---|
+| `GET /spatial` | 客户端缓存 5 分钟 |
+| `GET /facings` | 客户端缓存 30 秒 |
+| `GET /heatmap` | 客户端缓存 60 秒 |
+| `GET /forecast` | 服务端缓存 10 分钟 |
+| WebSocket | 断线重连 + 事件补发 |
+
+---
+
+## 8. 关键 Hook 设计
+
+### 8.1 `useSpatialData`
+
+```typescript
+function useSpatialData(storeId: string) {
+  const setSpatial = useSpatialStore((s) => s.loadSpatial);
+  return useQuery({
+    queryKey: ['spatial', storeId],
+    queryFn: () => fetchSpatial(storeId),
+    staleTime: 5 * 60 * 1000,
+    onSuccess: (data) => setSpatial(data),
+  });
+}
+```
+
+### 8.2 `useReplenishStream`
+
+```typescript
+function useReplenishStream(storeId: string) {
+  const [lastEvent, setLastEvent] = useState<ReplenishEvent | null>(null);
+  useEffect(() => {
+    const ws = new WebSocket(`${WS_BASE}/ws/replenish?store=${storeId}`);
+    ws.onmessage = (msg) => setLastEvent(JSON.parse(msg.data));
+    ws.onerror = () => reconnect(ws);
+    return () => ws.close();
+  }, [storeId]);
+  return { lastEvent };
+}
+```
+
+### 8.3 `useThreeCamera`
+
+```typescript
+function useThreeCamera(controls: 'orbit' | 'fly' | 'topdown') {
+  const { camera, gl } = useThree();
+  useEffect(() => {
+    if (controls === 'orbit') {
+      const orbit = new OrbitControls(camera, gl.domElement);
+      orbit.enableDamping = true;
+      return () => orbit.dispose();
+    }
+    // ...
+  }, [controls, camera, gl]);
+}
+```
+
+---
+
+## 9. 交互规范
+
+| 交互 | 触发 | 响应 |
+|---|---|---|
+| 点击 Facings | 单击 | 选中 → 右侧面板显示 SKU 详情 |
+| 悬停 Facings | 鼠标悬浮 | 显示 Tooltip（SKU 名 + 库存 + 状态） |
+| 双击货架 | 双击 | 相机推进到该货架 |
+| 右键 Facings | 右键 | 弹出上下文菜单（查看预测 / 触发补货 / 查看批次） |
+| 拖动时间轴 | 拖动滑块 | 3D 视图状态随时间变化 |
+| 切换热力图 | 点击指标按钮 | 颜色重算，图例更新 |
+| 运行模拟 | 点击按钮 | 补货动画播放，结果表格刷新 |
+| Cmd+K | 键盘 | 打开命令面板 |
+
+---
+
+## 10. 与后端 API 的对接清单
+
+| 组件 | 依赖接口 | 触发时机 |
+|---|---|---|
+| `<SceneRoot>` | `GET /spatial` | 门店切换 |
+| `<FacingLayer>` | `GET /facings` | 初始加载 + 每 30 秒 |
+| `<ZoneHeatmapOverlay>` | `GET /heatmap` | 指标切换 |
+| `<ForecastPanel>` | `GET /forecast` | SKU 选中 + 时间轴变化 |
+| `<ReplenishmentPanel>` | `POST /replenish/simulate` | 用户点击 |
+| `<ReplenishAnimationController>` | `WS /ws/replenish` | 持续连接 |
+| `<SentimentPanel>` | `GET /sentiment` | 品类选中 |
+| `<RamadanSlider>` | `GET /calendar/2026` | 初始加载 |
+
+---
+
+## 11. 无障碍与国际化
+
+**键盘导航**：
+
+- `Tab` 在 Facings 间移动
+- `Enter` 选中
+- `Esc` 取消选中
+- `[` / `]` 切换门店规模
+
+**i18n**：
+
+- 所有用户可见文本通过 `useTranslation()` 获取
+- 支持 `zh` / `en` 双语
+- 日期格式：`id-ID` / `en-US` 自动切换
+
+**屏幕阅读器**：
+
+- 3D 场景提供 ARIA 描述
+- 关键操作提供 `aria-live` 通知
+
+---
+
+## 12. 更新日志
+
+| 日期 | 版本 | 变更 |
+|---|---|---|
+| 2026-10 | v0.1 | 初始版本，覆盖组件树、状态管理、数据流、性能优化 |
