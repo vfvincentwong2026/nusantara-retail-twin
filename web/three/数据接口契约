@@ -1,0 +1,445 @@
+# 3D Rendering Layer — API Contract
+
+> 3D 渲染层与后端 API 的 JSON 交换格式定义。
+> 版本：v0.1
+
+---
+
+## 1. 架构概览
+
+```text
+┌─────────────────────────────────────────────────┐
+│                 React 3D 前端                     │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────┐  │
+│  │ Floorplan   │  │ Three.js    │  │ Detail  │  │
+│  │ 2D Editor   │  │ Scene       │  │ Panel   │  │
+│  └──────┬──────┘  └──────┬──────┘  └────┬────┘  │
+│         │                │               │       │
+│         └────────────────┼───────────────┘       │
+│                          │ REST / WebSocket      │
+├──────────────────────────┼───────────────────────┤
+│                    后端 API                       │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────┐  │
+│  │ Spatial API │  │Inventory API│  │Forecast │  │
+│  │             │  │             │  │  API    │  │
+│  └─────────────┘  └─────────────┘  └─────────┘  │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## 2. 空间数据接口
+
+### 2.1 获取门店空间全量数据
+
+**请求**：
+
+```text
+GET /api/v1/stores/{store_id}/spatial
+```
+
+**响应**：
+
+```json
+{
+  "store_id": "uuid",
+  "store_name": "雅加达 Plaza Indonesia 店",
+  "store_size_sqm": 2000,
+  "store_format": "supermarket",
+  "island_region": "java",
+  "floor_plan": {
+    "width_m": 40.0,
+    "height_m": 50.0,
+    "zones": [
+      {
+        "zone_id": "uuid",
+        "zone_name": "生鲜区",
+        "zone_type": "fresh",
+        "heat_value": 0.85,
+        "polygon": [
+          { "x": 2.0, "y": 2.0 },
+          { "x": 18.0, "y": 2.0 },
+          { "x": 18.0, "y": 15.0 },
+          { "x": 2.0, "y": 15.0 }
+        ],
+        "fill_color": "#22C55E"
+      }
+    ],
+    "fixtures": [
+      {
+        "fixture_id": "uuid",
+        "fixture_label": "F-001",
+        "fixture_type": "gondola",
+        "position_x": 3.0,
+        "position_y": 5.0,
+        "length_m": 4.0,
+        "height_m": 1.8,
+        "rotation_deg": 0,
+        "zone_id": "uuid",
+        "shelf_levels": [
+          {
+            "shelf_level_id": "uuid",
+            "level_number": 1,
+            "height_from_floor_m": 0.15,
+            "is_eye_level": false,
+            "facings": [
+              {
+                "facing_id": "uuid",
+                "facing_index": 1,
+                "facing_width_m": 0.12,
+                "max_units": 24,
+                "sku_id": "uuid",
+                "sku_code": "SKU-001",
+                "sku_name": "Indomie Goreng",
+                "quantity": 18,
+                "status": "normal"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**状态枚举**：
+
+| status | 含义 | 渲染颜色 |
+|---|---|---|
+| `normal` | 库存正常 | 货架常态色 |
+| `low` | 低于再订货点 | 黄色 `#F59E0B` |
+| `critical` | 低于安全库存 | 红色 `#EF4444` |
+| `empty` | 缺货 | 深红 `#991B1B` |
+| `overstock` | 超量 | 蓝色 `#3B82F6` |
+| `expiring` | 临期 | 橙色 `#F97316` |
+
+---
+
+## 3. 库存与去化接口
+
+### 3.1 获取 Facings 粒度库存
+
+**请求**：
+
+```text
+GET /api/v1/stores/{store_id}/facings?zone_id={zone_id}&status={status}
+```
+
+**响应**：
+
+```json
+{
+  "store_id": "uuid",
+  "generated_at": "2026-10-14T08:30:00+07:00",
+  "total_facings": 4320,
+  "facings": [
+    {
+      "facing_id": "uuid",
+      "fixture_id": "uuid",
+      "fixture_label": "F-001",
+      "zone_id": "uuid",
+      "sku_id": "uuid",
+      "sku_code": "SKU-001",
+      "sku_name": "Indomie Goreng",
+      "quantity": 18,
+      "max_units": 24,
+      "fill_ratio": 0.75,
+      "status": "normal",
+      "turnover_rate": 12.5,
+      "days_of_supply": 1.44,
+      "expiry_date": "2026-12-15",
+      "shelf_life_remaining_days": 62
+    }
+  ]
+}
+```
+
+### 3.2 获取去化热力图
+
+**请求**：
+
+```text
+GET /api/v1/stores/{store_id}/heatmap?metric=turnover_rate
+```
+
+**可选 metric**：
+
+| metric | 说明 | 归一化范围 |
+|---|---|---|
+| `turnover_rate` | 去化速度 | 0-1 |
+| `gross_margin` | 毛利率 | 0-1 |
+| `stockout_risk` | 缺货风险 | 0-1 |
+| `days_of_supply` | 库存天数 | 0-1 |
+
+**响应**：
+
+```json
+{
+  "store_id": "uuid",
+  "metric": "turnover_rate",
+  "generated_at": "ISO8601",
+  "zones": [
+    {
+      "zone_id": "uuid",
+      "zone_name": "生鲜区",
+      "heat_value": 0.85,
+      "normalized_value": 0.85,
+      "legend": { "min": 0.0, "max": 1.0 }
+    }
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "uuid",
+      "heat_value": 0.72,
+      "top_skus": [
+        { "sku_code": "SKU-001", "turnover_rate": 18.5 }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 4. 补货模拟接口
+
+### 4.1 触发补货模拟
+
+**请求**：
+
+```text
+POST /api/v1/stores/{store_id}/replenish/simulate
+```
+
+**请求体**：
+
+```json
+{
+  "fixture_ids": ["uuid"],
+  "strategy": "reorder_point",
+  "override_lead_time_days": 7.5,
+  "include_ramadan": true,
+  "simulation_date": "2026-10-14"
+}
+```
+
+**策略枚举**：
+
+| strategy | 说明 |
+|---|---|
+| `reorder_point` | 基于再订货点 |
+| `fefo` | 先过期先出 |
+| `ramadan_pre` | 斋月前置补货 |
+| `auto` | 系统自动选择 |
+
+**响应**：
+
+```json
+{
+  "simulation_id": "uuid",
+  "store_id": "uuid",
+  "simulation_date": "2026-10-14",
+  "strategy": "reorder_point",
+  "results": [
+    {
+      "facing_id": "uuid",
+      "fixture_label": "F-001",
+      "sku_code": "SKU-001",
+      "sku_name": "Indomie Goreng",
+      "current_quantity": 8,
+      "reorder_point": 42,
+      "safety_stock": 18,
+      "effective_lead_time_days": 7.5,
+      "action": "ORDER",
+      "order_quantity": 60,
+      "priority": "HIGH",
+      "reason": "stock_below_reorder_point",
+      "visual": {
+        "before_status": "critical",
+        "after_status": "normal",
+        "before_fill_ratio": 0.33,
+        "after_fill_ratio": 0.92
+      }
+    }
+  ],
+  "summary": {
+    "total_facings_checked": 120,
+    "total_orders": 18,
+    "total_units_ordered": 840,
+    "estimated_cost_idr": 12500000
+  }
+}
+```
+
+### 4.2 补货动画事件（WebSocket）
+
+**连接**：
+
+```text
+ws://localhost:4000/ws/replenish
+```
+
+**服务端推送**：
+
+```json
+{
+  "event": "replenish_update",
+  "simulation_id": "uuid",
+  "timestamp": "ISO8601",
+  "updates": [
+    {
+      "facing_id": "uuid",
+      "fixture_label": "F-001",
+      "sku_code": "SKU-001",
+      "previous_quantity": 8,
+      "new_quantity": 68,
+      "status": "normal",
+      "animation": {
+        "type": "replenish_fly_in",
+        "duration_ms": 1200,
+        "from_position": { "x": 0, "y": 3.0, "z": 0 },
+        "to_position": { "x": 3.0, "y": 1.0, "z": 5.0 }
+      }
+    }
+  ]
+}
+```
+
+---
+
+## 5. 需求预测接口
+
+### 5.1 获取 SKU 预测
+
+**请求**：
+
+```text
+GET /api/v1/stores/{store_id}/forecast?sku_id={sku_id}&horizon_days=30
+```
+
+**响应**：
+
+```json
+{
+  "store_id": "uuid",
+  "sku_id": "uuid",
+  "sku_code": "SKU-001",
+  "sku_name": "Indomie Goreng",
+  "generated_at": "ISO8601",
+  "model_version": "prophet-lgbm-v0.1",
+  "confidence": 0.87,
+  "horizon": {
+    "start_date": "2026-10-14",
+    "end_date": "2026-11-13",
+    "daily_forecast": [
+      {
+        "date": "2026-10-14",
+        "demand_mean": 14.2,
+        "demand_p90": 22.0,
+        "is_ramadan": false,
+        "is_holiday": false
+      }
+    ]
+  },
+  "safety_stock": 18,
+  "reorder_point": 42,
+  "suggested_order_quantity": 60
+}
+```
+
+### 5.2 斋月窗口预测
+
+**请求**：
+
+```text
+GET /api/v1/stores/{store_id}/forecast/ramadan?year=2026
+```
+
+**响应**：
+
+```json
+{
+  "store_id": "uuid",
+  "ramadan_start": "2026-02-19",
+  "lebaran_date": "2026-03-20",
+  "island_region": "java",
+  "mudik_offset_days": -7,
+  "window": {
+    "pre_ramadan_weeks": 8,
+    "post_lebaran_weeks": 2,
+    "peak_date": "2026-03-13",
+    "daily_demand_multiplier": [
+      { "date": "2026-02-19", "multiplier": 1.15 },
+      { "date": "2026-03-13", "multiplier": 2.35 }
+    ]
+  },
+  "pre_replenishment_windows": [
+    { "round": 1, "start": "2026-01-01", "end": "2026-01-15" },
+    { "round": 2, "start": "2026-02-19", "end": "2026-03-06" }
+  ]
+}
+```
+
+---
+
+## 6. 3D 场景交互事件
+
+### 6.1 前端 → 后端
+
+| 事件 | 触发方式 | 载荷 |
+|---|---|---|
+| `facing_click` | 点击 Facings | `{ facing_id, fixture_label }` |
+| `zone_click` | 点击 Zone 区域 | `{ zone_id }` |
+| `fixture_hover` | 悬浮货架 | `{ fixture_id }` |
+| `metric_change` | 切换热力图指标 | `{ metric }` |
+| `simulation_run` | 点击“模拟补货” | `{ fixture_ids, strategy }` |
+
+### 6.2 后端 → 前端
+
+| 事件 | 说明 | 载荷 |
+|---|---|---|
+| `inventory_update` | 库存变化 | `{ updates: [{ facing_id, quantity, status }] }` |
+| `forecast_update` | 预测刷新 | `{ sku_id, forecast }` |
+| `alert` | 告警 | `{ type, facing_id, message }` |
+
+---
+
+## 7. 错误处理
+
+**统一错误格式**：
+
+```json
+{
+  "error": {
+    "code": "STORE_NOT_FOUND",
+    "message": "Store with id 'xxx' does not exist",
+    "status": 404,
+    "timestamp": "ISO8601"
+  }
+}
+```
+
+**错误码表**：
+
+| code | HTTP | 说明 |
+|---|---|---|
+| `STORE_NOT_FOUND` | 404 | 门店不存在 |
+| `FACING_NOT_FOUND` | 404 | Facings 不存在 |
+| `INVALID_METRIC` | 400 | 热力图指标无效 |
+| `SIMULATION_IN_PROGRESS` | 409 | 同一门店已有模拟在运行 |
+| `FORECAST_NOT_READY` | 503 | 预测数据尚未生成 |
+| `RATE_LIMITED` | 429 | 请求频率超限 |
+
+---
+
+## 8. 性能约束
+
+| 接口 | 响应时间目标 | 缓存策略 |
+|---|---|---|
+| `GET /spatial` | < 500ms | 客户端缓存 5 分钟 |
+| `GET /facings` | < 200ms | 客户端缓存 30 秒 |
+| `GET /heatmap` | < 300ms | 客户端缓存 60 秒 |
+| `POST /replenish/simulate` | < 2s | 不缓存 |
+| `GET /forecast` | < 1s | 服务端缓存 10 分钟 |
+| `WS /replenish` | 实时推送 | 无 |
