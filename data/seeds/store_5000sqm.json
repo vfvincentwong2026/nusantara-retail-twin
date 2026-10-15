@@ -1,1061 +1,1193 @@
 {
-  "meta": {
-    "seed_version": "0.1",
-    "generated_at": "2026-10-14T08:00:00+07:00",
-    "store_size_sqm": 5000,
-    "store_format": "hypermarket",
-    "island_region": "java",
-    "source": "nrt seed --store-size 5000 --region java"
+ "meta": {
+  "seed_version": "0.1",
+  "generated_at": "2026-10-14T08:00:00+07:00",
+  "store_size_sqm": 5000,
+  "store_format": "hypermarket",
+  "island_region": "java",
+  "source": "nrt seed --store-size 5000 --region java"
+ },
+ "store_profile": {
+  "store_id": "st-5000-java-001",
+  "store_name": "雅加达郊区 Hypermart 旗舰店",
+  "store_size_sqm": 5000,
+  "store_format": "hypermarket",
+  "island_region": "java",
+  "city": "Jakarta",
+  "latitude": -6.3025,
+  "longitude": 106.895,
+  "target_sku_count": 34000,
+  "sku_density": 6.8,
+  "fresh_ratio": 0.33,
+  "shelf_layers": 7,
+  "aisle_width_m": 3.5,
+  "qris_enabled": true,
+  "supply_hub_distance_km": 15.0,
+  "lead_time_variance_days": 1.0,
+  "mudik_offset": -7
+ },
+ "zones": [
+  {
+   "zone_id": "zn-5000-001",
+   "zone_name": "入口与节庆促销区",
+   "zone_type": "ambient",
+   "heat_value": 0.78,
+   "polygon": [
+    {
+     "x": 0.0,
+     "y": 0.0
+    },
+    {
+     "x": 60.0,
+     "y": 0.0
+    },
+    {
+     "x": 60.0,
+     "y": 12.0
+    },
+    {
+     "x": 0.0,
+     "y": 12.0
+    }
+   ]
   },
-
-  "store_profile": {
-    "store_id": "st-5000-java-001",
-    "store_name": "雅加达郊区 Hypermart 旗舰店",
-    "store_size_sqm": 5000,
-    "store_format": "hypermarket",
-    "island_region": "java",
-    "city": "Jakarta",
-    "latitude": -6.3025,
-    "longitude": 106.8950,
-    "target_sku_count": 34000,
-    "sku_density": 6.8,
-    "fresh_ratio": 0.33,
-    "shelf_layers": 7,
-    "aisle_width_m": 3.5,
-    "qris_enabled": true,
-    "supply_hub_distance_km": 15.0,
-    "lead_time_variance_days": 1.0,
-    "mudik_offset": -7
+  {
+   "zone_id": "zn-5000-002",
+   "zone_name": "生鲜蔬果区",
+   "zone_type": "fresh",
+   "heat_value": 0.94,
+   "polygon": [
+    {
+     "x": 0.0,
+     "y": 12.0
+    },
+    {
+     "x": 25.0,
+     "y": 12.0
+    },
+    {
+     "x": 25.0,
+     "y": 32.0
+    },
+    {
+     "x": 0.0,
+     "y": 32.0
+    }
+   ]
   },
-
-  "zones": [
+  {
+   "zone_id": "zn-5000-003",
+   "zone_name": "肉类与海鲜区",
+   "zone_type": "fresh",
+   "heat_value": 0.91,
+   "polygon": [
     {
-      "zone_id": "zn-5000-001",
-      "zone_name": "入口与节庆促销区",
-      "zone_type": "ambient",
-      "heat_value": 0.78,
-      "polygon": [
-        { "x": 0.0, "y": 0.0 },
-        { "x": 60.0, "y": 0.0 },
-        { "x": 60.0, "y": 12.0 },
-        { "x": 0.0, "y": 12.0 }
-      ]
+     "x": 25.0,
+     "y": 12.0
     },
     {
-      "zone_id": "zn-5000-002",
-      "zone_name": "生鲜蔬果区",
-      "zone_type": "fresh",
-      "heat_value": 0.94,
-      "polygon": [
-        { "x": 0.0, "y": 12.0 },
-        { "x": 25.0, "y": 12.0 },
-        { "x": 25.0, "y": 32.0 },
-        { "x": 0.0, "y": 32.0 }
-      ]
+     "x": 45.0,
+     "y": 12.0
     },
     {
-      "zone_id": "zn-5000-003",
-      "zone_name": "肉类与海鲜区",
-      "zone_type": "fresh",
-      "heat_value": 0.91,
-      "polygon": [
-        { "x": 25.0, "y": 12.0 },
-        { "x": 45.0, "y": 12.0 },
-        { "x": 45.0, "y": 32.0 },
-        { "x": 25.0, "y": 32.0 }
-      ]
+     "x": 45.0,
+     "y": 32.0
     },
     {
-      "zone_id": "zn-5000-004",
-      "zone_name": "熟食与烘焙区",
-      "zone_type": "fresh",
-      "heat_value": 0.85,
-      "polygon": [
-        { "x": 45.0, "y": 12.0 },
-        { "x": 60.0, "y": 12.0 },
-        { "x": 60.0, "y": 32.0 },
-        { "x": 45.0, "y": 32.0 }
-      ]
-    },
-    {
-      "zone_id": "zn-5000-005",
-      "zone_name": "饮料与零食区",
-      "zone_type": "ambient",
-      "heat_value": 0.88,
-      "polygon": [
-        { "x": 0.0, "y": 32.0 },
-        { "x": 20.0, "y": 32.0 },
-        { "x": 20.0, "y": 48.0 },
-        { "x": 0.0, "y": 48.0 }
-      ]
-    },
-    {
-      "zone_id": "zn-5000-006",
-      "zone_name": "主食与粮油区",
-      "zone_type": "ambient",
-      "heat_value": 0.70,
-      "polygon": [
-        { "x": 20.0, "y": 32.0 },
-        { "x": 40.0, "y": 32.0 },
-        { "x": 40.0, "y": 48.0 },
-        { "x": 20.0, "y": 48.0 }
-      ]
-    },
-    {
-      "zone_id": "zn-5000-007",
-      "zone_name": "冷冻食品区",
-      "zone_type": "frozen",
-      "heat_value": 0.76,
-      "polygon": [
-        { "x": 40.0, "y": 32.0 },
-        { "x": 60.0, "y": 32.0 },
-        { "x": 60.0, "y": 48.0 },
-        { "x": 40.0, "y": 48.0 }
-      ]
-    },
-    {
-      "zone_id": "zn-5000-008",
-      "zone_name": "日用与个护区",
-      "zone_type": "household",
-      "heat_value": 0.60,
-      "polygon": [
-        { "x": 0.0, "y": 48.0 },
-        { "x": 20.0, "y": 48.0 },
-        { "x": 20.0, "y": 60.0 },
-        { "x": 0.0, "y": 60.0 }
-      ]
-    },
-    {
-      "zone_id": "zn-5000-009",
-      "zone_name": "家居与家电区",
-      "zone_type": "household",
-      "heat_value": 0.52,
-      "polygon": [
-        { "x": 20.0, "y": 48.0 },
-        { "x": 40.0, "y": 48.0 },
-        { "x": 40.0, "y": 60.0 },
-        { "x": 20.0, "y": 60.0 }
-      ]
-    },
-    {
-      "zone_id": "zn-5000-010",
-      "zone_name": "服饰与穆斯林专区",
-      "zone_type": "fashion",
-      "heat_value": 0.65,
-      "polygon": [
-        { "x": 40.0, "y": 48.0 },
-        { "x": 60.0, "y": 48.0 },
-        { "x": 60.0, "y": 60.0 },
-        { "x": 40.0, "y": 60.0 }
-      ]
-    },
-    {
-      "zone_id": "zn-5000-011",
-      "zone_name": "收银与即食区",
-      "zone_type": "ambient",
-      "heat_value": 0.82,
-      "polygon": [
-        { "x": 0.0, "y": 60.0 },
-        { "x": 60.0, "y": 60.0 },
-        { "x": 60.0, "y": 68.0 },
-        { "x": 0.0, "y": 68.0 }
-      ]
+     "x": 25.0,
+     "y": 32.0
     }
-  ],
-
-  "fixtures": [
-    {
-      "fixture_id": "fx-5000-001",
-      "zone_id": "zn-5000-001",
-      "fixture_type": "gondola",
-      "fixture_label": "F-001",
-      "position_x": 10.0,
-      "position_y": 6.0,
-      "length_m": 5.0,
-      "height_m": 2.0,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-002",
-      "zone_id": "zn-5000-001",
-      "fixture_type": "gondola",
-      "fixture_label": "F-002",
-      "position_x": 30.0,
-      "position_y": 6.0,
-      "length_m": 5.0,
-      "height_m": 2.0,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-003",
-      "zone_id": "zn-5000-001",
-      "fixture_type": "gondola",
-      "fixture_label": "F-003",
-      "position_x": 50.0,
-      "position_y": 6.0,
-      "length_m": 5.0,
-      "height_m": 2.0,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-004",
-      "zone_id": "zn-5000-002",
-      "fixture_type": "produce_rack",
-      "fixture_label": "P-001",
-      "position_x": 6.0,
-      "position_y": 17.0,
-      "length_m": 5.0,
-      "height_m": 1.5,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-005",
-      "zone_id": "zn-5000-002",
-      "fixture_type": "produce_rack",
-      "fixture_label": "P-002",
-      "position_x": 6.0,
-      "position_y": 24.0,
-      "length_m": 5.0,
-      "height_m": 1.5,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-006",
-      "zone_id": "zn-5000-002",
-      "fixture_type": "cooler",
-      "fixture_label": "C-001",
-      "position_x": 18.0,
-      "position_y": 17.0,
-      "length_m": 5.0,
-      "height_m": 1.9,
-      "rotation_deg": 90
-    },
-    {
-      "fixture_id": "fx-5000-007",
-      "zone_id": "zn-5000-002",
-      "fixture_type": "cooler",
-      "fixture_label": "C-002",
-      "position_x": 18.0,
-      "position_y": 24.0,
-      "length_m": 5.0,
-      "height_m": 1.9,
-      "rotation_deg": 90
-    },
-    {
-      "fixture_id": "fx-5000-008",
-      "zone_id": "zn-5000-003",
-      "fixture_type": "meat_counter",
-      "fixture_label": "M-001",
-      "position_x": 30.0,
-      "position_y": 17.0,
-      "length_m": 6.0,
-      "height_m": 1.2,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-009",
-      "zone_id": "zn-5000-003",
-      "fixture_type": "seafood_counter",
-      "fixture_label": "S-001",
-      "position_x": 30.0,
-      "position_y": 24.0,
-      "length_m": 6.0,
-      "height_m": 1.2,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-010",
-      "zone_id": "zn-5000-004",
-      "fixture_type": "bakery_counter",
-      "fixture_label": "B-001",
-      "position_x": 50.0,
-      "position_y": 17.0,
-      "length_m": 5.0,
-      "height_m": 1.3,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-011",
-      "zone_id": "zn-5000-004",
-      "fixture_type": "hot_food_counter",
-      "fixture_label": "H-001",
-      "position_x": 50.0,
-      "position_y": 24.0,
-      "length_m": 5.0,
-      "height_m": 1.3,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-012",
-      "zone_id": "zn-5000-005",
-      "fixture_type": "gondola",
-      "fixture_label": "F-004",
-      "position_x": 6.0,
-      "position_y": 38.0,
-      "length_m": 5.0,
-      "height_m": 2.0,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-013",
-      "zone_id": "zn-5000-005",
-      "fixture_type": "gondola",
-      "fixture_label": "F-005",
-      "position_x": 14.0,
-      "position_y": 38.0,
-      "length_m": 5.0,
-      "height_m": 2.0,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-014",
-      "zone_id": "zn-5000-005",
-      "fixture_type": "gondola",
-      "fixture_label": "F-006",
-      "position_x": 6.0,
-      "position_y": 44.0,
-      "length_m": 5.0,
-      "height_m": 2.0,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-015",
-      "zone_id": "zn-5000-006",
-      "fixture_type": "gondola",
-      "fixture_label": "F-007",
-      "position_x": 26.0,
-      "position_y": 38.0,
-      "length_m": 5.0,
-      "height_m": 2.2,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-016",
-      "zone_id": "zn-5000-006",
-      "fixture_type": "gondola",
-      "fixture_label": "F-008",
-      "position_x": 34.0,
-      "position_y": 38.0,
-      "length_m": 5.0,
-      "height_m": 2.2,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-017",
-      "zone_id": "zn-5000-007",
-      "fixture_type": "freezer",
-      "fixture_label": "Z-001",
-      "position_x": 46.0,
-      "position_y": 38.0,
-      "length_m": 5.0,
-      "height_m": 1.9,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-018",
-      "zone_id": "zn-5000-007",
-      "fixture_type": "freezer",
-      "fixture_label": "Z-002",
-      "position_x": 54.0,
-      "position_y": 38.0,
-      "length_m": 5.0,
-      "height_m": 1.9,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-019",
-      "zone_id": "zn-5000-008",
-      "fixture_type": "shelf",
-      "fixture_label": "F-009",
-      "position_x": 6.0,
-      "position_y": 54.0,
-      "length_m": 5.0,
-      "height_m": 2.2,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-020",
-      "zone_id": "zn-5000-009",
-      "fixture_type": "shelf",
-      "fixture_label": "F-010",
-      "position_x": 26.0,
-      "position_y": 54.0,
-      "length_m": 5.0,
-      "height_m": 2.2,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-021",
-      "zone_id": "zn-5000-010",
-      "fixture_type": "shelf",
-      "fixture_label": "F-011",
-      "position_x": 46.0,
-      "position_y": 54.0,
-      "length_m": 5.0,
-      "height_m": 2.0,
-      "rotation_deg": 0
-    },
-    {
-      "fixture_id": "fx-5000-022",
-      "zone_id": "zn-5000-011",
-      "fixture_type": "shelf",
-      "fixture_label": "F-012",
-      "position_x": 10.0,
-      "position_y": 64.0,
-      "length_m": 5.0,
-      "height_m": 1.5,
-      "rotation_deg": 0
-    }
-  ],
-
-  "shelf_levels": [
-    {
-      "shelf_level_id": "sl-5000-001-1",
-      "fixture_id": "fx-5000-001",
-      "level_number": 1,
-      "height_from_floor_m": 0.15,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-001-2",
-      "fixture_id": "fx-5000-001",
-      "level_number": 2,
-      "height_from_floor_m": 0.45,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-001-3",
-      "fixture_id": "fx-5000-001",
-      "level_number": 3,
-      "height_from_floor_m": 0.75,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-001-4",
-      "fixture_id": "fx-5000-001",
-      "level_number": 4,
-      "height_from_floor_m": 1.05,
-      "is_eye_level": true
-    },
-    {
-      "shelf_level_id": "sl-5000-001-5",
-      "fixture_id": "fx-5000-001",
-      "level_number": 5,
-      "height_from_floor_m": 1.35,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-001-6",
-      "fixture_id": "fx-5000-001",
-      "level_number": 6,
-      "height_from_floor_m": 1.65,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-001-7",
-      "fixture_id": "fx-5000-001",
-      "level_number": 7,
-      "height_from_floor_m": 1.95,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-012-1",
-      "fixture_id": "fx-5000-012",
-      "level_number": 1,
-      "height_from_floor_m": 0.15,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-012-2",
-      "fixture_id": "fx-5000-012",
-      "level_number": 2,
-      "height_from_floor_m": 0.45,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-012-3",
-      "fixture_id": "fx-5000-012",
-      "level_number": 3,
-      "height_from_floor_m": 0.75,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-012-4",
-      "fixture_id": "fx-5000-012",
-      "level_number": 4,
-      "height_from_floor_m": 1.05,
-      "is_eye_level": true
-    },
-    {
-      "shelf_level_id": "sl-5000-012-5",
-      "fixture_id": "fx-5000-012",
-      "level_number": 5,
-      "height_from_floor_m": 1.35,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-012-6",
-      "fixture_id": "fx-5000-012",
-      "level_number": 6,
-      "height_from_floor_m": 1.65,
-      "is_eye_level": false
-    },
-    {
-      "shelf_level_id": "sl-5000-012-7",
-      "fixture_id": "fx-5000-012",
-      "level_number": 7,
-      "height_from_floor_m": 1.95,
-      "is_eye_level": false
-    }
-  ],
-
-  "sample_facings": [
-    {
-      "facing_id": "fc-5000-001-1-01",
-      "shelf_level_id": "sl-5000-001-1",
-      "facing_index": 1,
-      "facing_width_m": 0.12,
-      "max_units": 48,
-      "sku_code": "SKU-IDM-GRG-85",
-      "planogram_version": 1
-    },
-    {
-      "facing_id": "fc-5000-001-1-02",
-      "shelf_level_id": "sl-5000-001-1",
-      "facing_index": 2,
-      "facing_width_m": 0.12,
-      "max_units": 48,
-      "sku_code": "SKU-IDM-KRG-85",
-      "planogram_version": 1
-    },
-    {
-      "facing_id": "fc-5000-001-1-03",
-      "shelf_level_id": "sl-5000-001-1",
-      "facing_index": 3,
-      "facing_width_m": 0.12,
-      "max_units": 48,
-      "sku_code": "SKU-IDM-SOP-85",
-      "planogram_version": 1
-    },
-    {
-      "facing_id": "fc-5000-012-4-01",
-      "shelf_level_id": "sl-5000-012-4",
-      "facing_index": 1,
-      "facing_width_m": 0.13,
-      "max_units": 30,
-      "sku_code": "SKU-AQU-600",
-      "planogram_version": 1
-    },
-    {
-      "facing_id": "fc-5000-012-4-02",
-      "shelf_level_id": "sl-5000-012-4",
-      "facing_index": 2,
-      "facing_width_m": 0.13,
-      "max_units": 30,
-      "sku_code": "SKU-TEH-PCS-350",
-      "planogram_version": 1
-    },
-    {
-      "facing_id": "fc-5000-012-4-03",
-      "shelf_level_id": "sl-5000-012-4",
-      "facing_index": 3,
-      "facing_width_m": 0.13,
-      "max_units": 30,
-      "sku_code": "SKU-CCO-COLA-390",
-      "planogram_version": 1
-    },
-    {
-      "facing_id": "fc-5000-012-4-04",
-      "shelf_level_id": "sl-5000-012-4",
-      "facing_index": 4,
-      "facing_width_m": 0.13,
-      "max_units": 30,
-      "sku_code": "SKU-POC-SWE-500",
-      "planogram_version": 1
-    }
-  ],
-
-  "sample_skus": [
-    {
-      "sku_id": "sku-001",
-      "sku_code": "SKU-IDM-GRG-85",
-      "sku_name": "Indomie Goreng 85g",
-      "category_name": "方便面",
-      "subcategory": "油炸方便面",
-      "brand": "Indomie",
-      "unit_price": 3500,
-      "unit_cost": 2800,
-      "gross_margin": 0.20,
-      "shelf_life_days": 180,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.95,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-002",
-      "sku_code": "SKU-IDM-KRG-85",
-      "sku_name": "Indomie Kari Ayam 85g",
-      "category_name": "方便面",
-      "subcategory": "油炸方便面",
-      "brand": "Indomie",
-      "unit_price": 3500,
-      "unit_cost": 2800,
-      "gross_margin": 0.20,
-      "shelf_life_days": 180,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.95,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-003",
-      "sku_code": "SKU-IDM-SOP-85",
-      "sku_name": "Indomie Soto Betawi 85g",
-      "category_name": "方便面",
-      "subcategory": "油炸方便面",
-      "brand": "Indomie",
-      "unit_price": 3500,
-      "unit_cost": 2800,
-      "gross_margin": 0.20,
-      "shelf_life_days": 180,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.95,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-004",
-      "sku_code": "SKU-AQU-600",
-      "sku_name": "Aqua Mineral 600ml",
-      "category_name": "饮料",
-      "subcategory": "瓶装水",
-      "brand": "Aqua",
-      "unit_price": 4000,
-      "unit_cost": 2600,
-      "gross_margin": 0.35,
-      "shelf_life_days": 365,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-005",
-      "sku_code": "SKU-TEH-PCS-350",
-      "sku_name": "Teh Pucuk Harum 350ml",
-      "category_name": "饮料",
-      "subcategory": "茶饮料",
-      "brand": "Teh Pucuk",
-      "unit_price": 5000,
-      "unit_cost": 3200,
-      "gross_margin": 0.36,
-      "shelf_life_days": 270,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-006",
-      "sku_code": "SKU-CCO-COLA-390",
-      "sku_name": "Coca-Cola 390ml",
-      "category_name": "饮料",
-      "subcategory": "碳酸饮料",
-      "brand": "Coca-Cola",
-      "unit_price": 6500,
-      "unit_cost": 4500,
-      "gross_margin": 0.31,
-      "shelf_life_days": 270,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.40,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-007",
-      "sku_code": "SKU-POC-SWE-500",
-      "sku_name": "Pocari Sweat 500ml",
-      "category_name": "饮料",
-      "subcategory": "运动饮料",
-      "brand": "Pocari",
-      "unit_price": 8500,
-      "unit_cost": 6000,
-      "gross_margin": 0.29,
-      "shelf_life_days": 365,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.30,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-008",
-      "sku_code": "SKU-BRS-PRM-5KG",
-      "sku_name": "Beras Premium 5kg",
-      "category_name": "主食",
-      "subcategory": "大米",
-      "brand": "Beras Lokal",
-      "unit_price": 68000,
-      "unit_cost": 58000,
-      "gross_margin": 0.15,
-      "shelf_life_days": 365,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-009",
-      "sku_code": "SKU-MYK-BIM-1L",
-      "sku_name": "Minyak Goreng Bimoli 1L",
-      "category_name": "主食",
-      "subcategory": "食用油",
-      "brand": "Bimoli",
-      "unit_price": 22000,
-      "unit_cost": 18000,
-      "gross_margin": 0.18,
-      "shelf_life_days": 540,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-010",
-      "sku_code": "SKU-GUL-GLM-1KG",
-      "sku_name": "Gula Pasir Gulaku 1kg",
-      "category_name": "主食",
-      "subcategory": "糖",
-      "brand": "Gulaku",
-      "unit_price": 18000,
-      "unit_cost": 14000,
-      "gross_margin": 0.22,
-      "shelf_life_days": 730,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": true,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-011",
-      "sku_code": "SKU-AYM-FRS-1KG",
-      "sku_name": "Ayam Fresh 1kg",
-      "category_name": "生鲜",
-      "subcategory": "禽肉",
-      "brand": "Fresh Local",
-      "unit_price": 42000,
-      "unit_cost": 35000,
-      "gross_margin": 0.17,
-      "shelf_life_days": 3,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": false,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-012",
-      "sku_code": "SKU-SAP-FRS-500",
-      "sku_name": "Sapi Segar 500g",
-      "category_name": "生鲜",
-      "subcategory": "牛肉",
-      "brand": "Fresh Local",
-      "unit_price": 78000,
-      "unit_cost": 65000,
-      "gross_margin": 0.17,
-      "shelf_life_days": 3,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": false,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-013",
-      "sku_code": "SKU-IKN-KMB-500",
-      "sku_name": "Ikan Kembung Segar 500g",
-      "category_name": "生鲜",
-      "subcategory": "海鲜",
-      "brand": "Fresh Local",
-      "unit_price": 38000,
-      "unit_cost": 30000,
-      "gross_margin": 0.21,
-      "shelf_life_days": 2,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": false,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-014",
-      "sku_code": "SKU-UDR-FRS-1KG",
-      "sku_name": "Udang Segar 1kg",
-      "category_name": "生鲜",
-      "subcategory": "海鲜",
-      "brand": "Fresh Local",
-      "unit_price": 92000,
-      "unit_cost": 75000,
-      "gross_margin": 0.18,
-      "shelf_life_days": 2,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-015",
-      "sku_code": "SKU-SYR-BAY-500",
-      "sku_name": "Bayam Segar 500g",
-      "category_name": "生鲜",
-      "subcategory": "叶菜",
-      "brand": "Fresh Local",
-      "unit_price": 12000,
-      "unit_cost": 9500,
-      "gross_margin": 0.21,
-      "shelf_life_days": 3,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-016",
-      "sku_code": "SKU-PIS-CAV-1KG",
-      "sku_name": "Pisang Cavendish 1kg",
-      "category_name": "生鲜",
-      "subcategory": "水果",
-      "brand": "Fresh Local",
-      "unit_price": 28000,
-      "unit_cost": 22000,
-      "gross_margin": 0.21,
-      "shelf_life_days": 5,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-017",
-      "sku_code": "SKU-APL-FUJ-1KG",
-      "sku_name": "Apel Fuji 1kg",
-      "category_name": "生鲜",
-      "subcategory": "水果",
-      "brand": "Fresh Import",
-      "unit_price": 45000,
-      "unit_cost": 35000,
-      "gross_margin": 0.22,
-      "shelf_life_days": 14,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 0.0,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-018",
-      "sku_code": "SKU-ROT-TWR-500",
-      "sku_name": "Roti Tawar Sari Roti 500g",
-      "category_name": "烘焙",
-      "subcategory": "面包",
-      "brand": "Sari Roti",
-      "unit_price": 18000,
-      "unit_cost": 13500,
-      "gross_margin": 0.25,
-      "shelf_life_days": 7,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 0.95,
-      "mudik_sensitive": false,
-      "abc_class": "A"
-    },
-    {
-      "sku_id": "sku-019",
-      "sku_code": "SKU-KUE-BAS-500",
-      "sku_name": "Kue Basah Mix 500g",
-      "category_name": "烘焙",
-      "subcategory": "传统糕点",
-      "brand": "Fresh Local",
-      "unit_price": 35000,
-      "unit_cost": 25000,
-      "gross_margin": 0.29,
-      "shelf_life_days": 2,
-      "fresh_flag": true,
-      "halal_certified": true,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-020",
-      "sku_code": "SKU-NGT-FRZ-500",
-      "sku_name": "Nugget Fiesta 500g (Frozen)",
-      "category_name": "冷冻食品",
-      "subcategory": "冷冻肉制品",
-      "brand": "Fiesta",
-      "unit_price": 42000,
-      "unit_cost": 32000,
-      "gross_margin": 0.24,
-      "shelf_life_days": 365,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.85,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-021",
-      "sku_code": "SKU-ESK-WAL-1L",
-      "sku_name": "Es Krim Walls 1L (Frozen)",
-      "category_name": "冷冻食品",
-      "subcategory": "冰淇淋",
-      "brand": "Walls",
-      "unit_price": 52000,
-      "unit_cost": 38000,
-      "gross_margin": 0.27,
-      "shelf_life_days": 365,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.50,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-022",
-      "sku_code": "SKU-SBN-ALF-1L",
-      "sku_name": "Sunsilk Shampoo 1L",
-      "category_name": "个护",
-      "subcategory": "洗发水",
-      "brand": "Sunsilk",
-      "unit_price": 58000,
-      "unit_cost": 42000,
-      "gross_margin": 0.28,
-      "shelf_life_days": 1095,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.55,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-023",
-      "sku_code": "SKU-PPR-BTL-500",
-      "sku_name": "Pepsodent 500g",
-      "category_name": "个护",
-      "subcategory": "牙膏",
-      "brand": "Pepsodent",
-      "unit_price": 32000,
-      "unit_cost": 23000,
-      "gross_margin": 0.28,
-      "shelf_life_days": 1095,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.45,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-024",
-      "sku_code": "SKU-SAB-LIF-800",
-      "sku_name": "Lifebuoy Sabun Cair 800ml",
-      "category_name": "个护",
-      "subcategory": "沐浴露",
-      "brand": "Lifebuoy",
-      "unit_price": 45000,
-      "unit_cost": 33000,
-      "gross_margin": 0.27,
-      "shelf_life_days": 1095,
-      "fresh_flag": false,
-      "halal_certified": true,
-      "local_content_ratio": 0.50,
-      "mudik_sensitive": false,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-025",
-      "sku_code": "SKU-GAM-RMD-01",
-      "sku_name": "Gamis Ramadhan Premium",
-      "category_name": "服饰",
-      "subcategory": "穆斯林女装",
-      "brand": "Local Fashion",
-      "unit_price": 320000,
-      "unit_cost": 210000,
-      "gross_margin": 0.34,
-      "shelf_life_days": null,
-      "fresh_flag": false,
-      "halal_certified": null,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": true,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-026",
-      "sku_code": "SKU-KKO-RMD-01",
-      "sku_name": "Koko Ramadhan Set",
-      "category_name": "服饰",
-      "subcategory": "穆斯林男装",
-      "brand": "Local Fashion",
-      "unit_price": 280000,
-      "unit_cost": 180000,
-      "gross_margin": 0.36,
-      "shelf_life_days": null,
-      "fresh_flag": false,
-      "halal_certified": null,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": true,
-      "abc_class": "B"
-    },
-    {
-      "sku_id": "sku-027",
-      "sku_code": "SKU-SJD-PRM-01",
-      "sku_name": "Sajadah Premium",
-      "category_name": "服饰",
-      "subcategory": "穆斯林配饰",
-      "brand": "Local Fashion",
-      "unit_price": 180000,
-      "unit_cost": 110000,
-      "gross_margin": 0.39,
-      "shelf_life_days": null,
-      "fresh_flag": false,
-      "halal_certified": null,
-      "local_content_ratio": 1.0,
-      "mudik_sensitive": true,
-      "abc_class": "B"
-    }
-  ],
-
-  "ramadan_calendar_2026": {
-    "ramadan_start": "2026-02-19",
-    "lebaran_date": "2026-03-20",
-    "peak_date": "2026-03-13",
-    "mudik_peak_date": "2026-03-17",
-    "pre_replenishment_windows": [
-      { "round": 1, "start": "2026-01-01", "end": "2026-01-15" },
-      { "round": 2, "start": "2026-02-19", "end": "2026-03-06" }
-    ]
+   ]
   },
-
-  "generation_summary": {
-    "zones_count": 11,
-    "fixtures_count": 22,
-    "shelf_levels_count": 154,
-    "facings_count": 10920,
-    "skus_count": 34000,
-    "fresh_skus_count": 11220,
-    "halal_certified_skus_count": 28900,
-    "note": "sample_facings 与 sample_skus 仅展示前若干条，完整数据由 nrt seed 命令生成"
+  {
+   "zone_id": "zn-5000-004",
+   "zone_name": "熟食与烘焙区",
+   "zone_type": "fresh",
+   "heat_value": 0.85,
+   "polygon": [
+    {
+     "x": 45.0,
+     "y": 12.0
+    },
+    {
+     "x": 60.0,
+     "y": 12.0
+    },
+    {
+     "x": 60.0,
+     "y": 32.0
+    },
+    {
+     "x": 45.0,
+     "y": 32.0
+    }
+   ]
+  },
+  {
+   "zone_id": "zn-5000-005",
+   "zone_name": "饮料与零食区",
+   "zone_type": "ambient",
+   "heat_value": 0.88,
+   "polygon": [
+    {
+     "x": 0.0,
+     "y": 32.0
+    },
+    {
+     "x": 20.0,
+     "y": 32.0
+    },
+    {
+     "x": 20.0,
+     "y": 48.0
+    },
+    {
+     "x": 0.0,
+     "y": 48.0
+    }
+   ]
+  },
+  {
+   "zone_id": "zn-5000-006",
+   "zone_name": "主食与粮油区",
+   "zone_type": "ambient",
+   "heat_value": 0.7,
+   "polygon": [
+    {
+     "x": 20.0,
+     "y": 32.0
+    },
+    {
+     "x": 40.0,
+     "y": 32.0
+    },
+    {
+     "x": 40.0,
+     "y": 48.0
+    },
+    {
+     "x": 20.0,
+     "y": 48.0
+    }
+   ]
+  },
+  {
+   "zone_id": "zn-5000-007",
+   "zone_name": "冷冻食品区",
+   "zone_type": "frozen",
+   "heat_value": 0.76,
+   "polygon": [
+    {
+     "x": 40.0,
+     "y": 32.0
+    },
+    {
+     "x": 60.0,
+     "y": 32.0
+    },
+    {
+     "x": 60.0,
+     "y": 48.0
+    },
+    {
+     "x": 40.0,
+     "y": 48.0
+    }
+   ]
+  },
+  {
+   "zone_id": "zn-5000-008",
+   "zone_name": "日用与个护区",
+   "zone_type": "household",
+   "heat_value": 0.6,
+   "polygon": [
+    {
+     "x": 0.0,
+     "y": 48.0
+    },
+    {
+     "x": 20.0,
+     "y": 48.0
+    },
+    {
+     "x": 20.0,
+     "y": 60.0
+    },
+    {
+     "x": 0.0,
+     "y": 60.0
+    }
+   ]
+  },
+  {
+   "zone_id": "zn-5000-009",
+   "zone_name": "家居与家电区",
+   "zone_type": "household",
+   "heat_value": 0.52,
+   "polygon": [
+    {
+     "x": 20.0,
+     "y": 48.0
+    },
+    {
+     "x": 40.0,
+     "y": 48.0
+    },
+    {
+     "x": 40.0,
+     "y": 60.0
+    },
+    {
+     "x": 20.0,
+     "y": 60.0
+    }
+   ]
+  },
+  {
+   "zone_id": "zn-5000-010",
+   "zone_name": "服饰与穆斯林专区",
+   "zone_type": "fashion",
+   "heat_value": 0.65,
+   "polygon": [
+    {
+     "x": 40.0,
+     "y": 48.0
+    },
+    {
+     "x": 60.0,
+     "y": 48.0
+    },
+    {
+     "x": 60.0,
+     "y": 60.0
+    },
+    {
+     "x": 40.0,
+     "y": 60.0
+    }
+   ]
+  },
+  {
+   "zone_id": "zn-5000-011",
+   "zone_name": "收银与即食区",
+   "zone_type": "ambient",
+   "heat_value": 0.82,
+   "polygon": [
+    {
+     "x": 0.0,
+     "y": 60.0
+    },
+    {
+     "x": 60.0,
+     "y": 60.0
+    },
+    {
+     "x": 60.0,
+     "y": 68.0
+    },
+    {
+     "x": 0.0,
+     "y": 68.0
+    }
+   ]
   }
+ ],
+ "fixtures": [
+  {
+   "fixture_id": "fx-5000-001",
+   "zone_id": "zn-5000-001",
+   "fixture_type": "gondola",
+   "fixture_label": "F-001",
+   "position_x": 10.0,
+   "position_y": 6.0,
+   "length_m": 5.0,
+   "height_m": 2.0,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-002",
+   "zone_id": "zn-5000-001",
+   "fixture_type": "gondola",
+   "fixture_label": "F-002",
+   "position_x": 30.0,
+   "position_y": 6.0,
+   "length_m": 5.0,
+   "height_m": 2.0,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-003",
+   "zone_id": "zn-5000-001",
+   "fixture_type": "gondola",
+   "fixture_label": "F-003",
+   "position_x": 50.0,
+   "position_y": 6.0,
+   "length_m": 5.0,
+   "height_m": 2.0,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-004",
+   "zone_id": "zn-5000-002",
+   "fixture_type": "produce_rack",
+   "fixture_label": "P-001",
+   "position_x": 6.0,
+   "position_y": 17.0,
+   "length_m": 5.0,
+   "height_m": 1.5,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-005",
+   "zone_id": "zn-5000-002",
+   "fixture_type": "produce_rack",
+   "fixture_label": "P-002",
+   "position_x": 6.0,
+   "position_y": 24.0,
+   "length_m": 5.0,
+   "height_m": 1.5,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-006",
+   "zone_id": "zn-5000-002",
+   "fixture_type": "cooler",
+   "fixture_label": "C-001",
+   "position_x": 18.0,
+   "position_y": 17.0,
+   "length_m": 5.0,
+   "height_m": 1.9,
+   "rotation_deg": 90
+  },
+  {
+   "fixture_id": "fx-5000-007",
+   "zone_id": "zn-5000-002",
+   "fixture_type": "cooler",
+   "fixture_label": "C-002",
+   "position_x": 18.0,
+   "position_y": 24.0,
+   "length_m": 5.0,
+   "height_m": 1.9,
+   "rotation_deg": 90
+  },
+  {
+   "fixture_id": "fx-5000-008",
+   "zone_id": "zn-5000-003",
+   "fixture_type": "meat_counter",
+   "fixture_label": "M-001",
+   "position_x": 30.0,
+   "position_y": 17.0,
+   "length_m": 6.0,
+   "height_m": 1.2,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-009",
+   "zone_id": "zn-5000-003",
+   "fixture_type": "seafood_counter",
+   "fixture_label": "S-001",
+   "position_x": 30.0,
+   "position_y": 24.0,
+   "length_m": 6.0,
+   "height_m": 1.2,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-010",
+   "zone_id": "zn-5000-004",
+   "fixture_type": "bakery_counter",
+   "fixture_label": "B-001",
+   "position_x": 50.0,
+   "position_y": 17.0,
+   "length_m": 5.0,
+   "height_m": 1.3,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-011",
+   "zone_id": "zn-5000-004",
+   "fixture_type": "hot_food_counter",
+   "fixture_label": "H-001",
+   "position_x": 50.0,
+   "position_y": 24.0,
+   "length_m": 5.0,
+   "height_m": 1.3,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-012",
+   "zone_id": "zn-5000-005",
+   "fixture_type": "gondola",
+   "fixture_label": "F-004",
+   "position_x": 6.0,
+   "position_y": 38.0,
+   "length_m": 5.0,
+   "height_m": 2.0,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-013",
+   "zone_id": "zn-5000-005",
+   "fixture_type": "gondola",
+   "fixture_label": "F-005",
+   "position_x": 14.0,
+   "position_y": 38.0,
+   "length_m": 5.0,
+   "height_m": 2.0,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-014",
+   "zone_id": "zn-5000-005",
+   "fixture_type": "gondola",
+   "fixture_label": "F-006",
+   "position_x": 6.0,
+   "position_y": 44.0,
+   "length_m": 5.0,
+   "height_m": 2.0,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-015",
+   "zone_id": "zn-5000-006",
+   "fixture_type": "gondola",
+   "fixture_label": "F-007",
+   "position_x": 26.0,
+   "position_y": 38.0,
+   "length_m": 5.0,
+   "height_m": 2.2,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-016",
+   "zone_id": "zn-5000-006",
+   "fixture_type": "gondola",
+   "fixture_label": "F-008",
+   "position_x": 34.0,
+   "position_y": 38.0,
+   "length_m": 5.0,
+   "height_m": 2.2,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-017",
+   "zone_id": "zn-5000-007",
+   "fixture_type": "freezer",
+   "fixture_label": "Z-001",
+   "position_x": 46.0,
+   "position_y": 38.0,
+   "length_m": 5.0,
+   "height_m": 1.9,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-018",
+   "zone_id": "zn-5000-007",
+   "fixture_type": "freezer",
+   "fixture_label": "Z-002",
+   "position_x": 54.0,
+   "position_y": 38.0,
+   "length_m": 5.0,
+   "height_m": 1.9,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-019",
+   "zone_id": "zn-5000-008",
+   "fixture_type": "shelf",
+   "fixture_label": "F-009",
+   "position_x": 6.0,
+   "position_y": 54.0,
+   "length_m": 5.0,
+   "height_m": 2.2,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-020",
+   "zone_id": "zn-5000-009",
+   "fixture_type": "shelf",
+   "fixture_label": "F-010",
+   "position_x": 26.0,
+   "position_y": 54.0,
+   "length_m": 5.0,
+   "height_m": 2.2,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-021",
+   "zone_id": "zn-5000-010",
+   "fixture_type": "shelf",
+   "fixture_label": "F-011",
+   "position_x": 46.0,
+   "position_y": 54.0,
+   "length_m": 5.0,
+   "height_m": 2.0,
+   "rotation_deg": 0
+  },
+  {
+   "fixture_id": "fx-5000-022",
+   "zone_id": "zn-5000-011",
+   "fixture_type": "shelf",
+   "fixture_label": "F-012",
+   "position_x": 10.0,
+   "position_y": 64.0,
+   "length_m": 5.0,
+   "height_m": 1.5,
+   "rotation_deg": 0
+  }
+ ],
+ "shelf_levels": [
+  {
+   "shelf_level_id": "sl-5000-001-1",
+   "fixture_id": "fx-5000-001",
+   "level_number": 1,
+   "height_from_floor_m": 0.15,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-001-2",
+   "fixture_id": "fx-5000-001",
+   "level_number": 2,
+   "height_from_floor_m": 0.45,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-001-3",
+   "fixture_id": "fx-5000-001",
+   "level_number": 3,
+   "height_from_floor_m": 0.75,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-001-4",
+   "fixture_id": "fx-5000-001",
+   "level_number": 4,
+   "height_from_floor_m": 1.05,
+   "is_eye_level": true
+  },
+  {
+   "shelf_level_id": "sl-5000-001-5",
+   "fixture_id": "fx-5000-001",
+   "level_number": 5,
+   "height_from_floor_m": 1.35,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-001-6",
+   "fixture_id": "fx-5000-001",
+   "level_number": 6,
+   "height_from_floor_m": 1.65,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-001-7",
+   "fixture_id": "fx-5000-001",
+   "level_number": 7,
+   "height_from_floor_m": 1.95,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-012-1",
+   "fixture_id": "fx-5000-012",
+   "level_number": 1,
+   "height_from_floor_m": 0.15,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-012-2",
+   "fixture_id": "fx-5000-012",
+   "level_number": 2,
+   "height_from_floor_m": 0.45,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-012-3",
+   "fixture_id": "fx-5000-012",
+   "level_number": 3,
+   "height_from_floor_m": 0.75,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-012-4",
+   "fixture_id": "fx-5000-012",
+   "level_number": 4,
+   "height_from_floor_m": 1.05,
+   "is_eye_level": true
+  },
+  {
+   "shelf_level_id": "sl-5000-012-5",
+   "fixture_id": "fx-5000-012",
+   "level_number": 5,
+   "height_from_floor_m": 1.35,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-012-6",
+   "fixture_id": "fx-5000-012",
+   "level_number": 6,
+   "height_from_floor_m": 1.65,
+   "is_eye_level": false
+  },
+  {
+   "shelf_level_id": "sl-5000-012-7",
+   "fixture_id": "fx-5000-012",
+   "level_number": 7,
+   "height_from_floor_m": 1.95,
+   "is_eye_level": false
+  }
+ ],
+ "sample_facings": [
+  {
+   "facing_id": "fc-5000-001-1-01",
+   "shelf_level_id": "sl-5000-001-1",
+   "facing_index": 1,
+   "facing_width_m": 0.12,
+   "max_units": 48,
+   "sku_code": "SKU-IDM-GRG-85",
+   "planogram_version": 1
+  },
+  {
+   "facing_id": "fc-5000-001-1-02",
+   "shelf_level_id": "sl-5000-001-1",
+   "facing_index": 2,
+   "facing_width_m": 0.12,
+   "max_units": 48,
+   "sku_code": "SKU-IDM-KRG-85",
+   "planogram_version": 1
+  },
+  {
+   "facing_id": "fc-5000-001-1-03",
+   "shelf_level_id": "sl-5000-001-1",
+   "facing_index": 3,
+   "facing_width_m": 0.12,
+   "max_units": 48,
+   "sku_code": "SKU-IDM-SOP-85",
+   "planogram_version": 1
+  },
+  {
+   "facing_id": "fc-5000-012-4-01",
+   "shelf_level_id": "sl-5000-012-4",
+   "facing_index": 1,
+   "facing_width_m": 0.13,
+   "max_units": 30,
+   "sku_code": "SKU-AQU-600",
+   "planogram_version": 1
+  },
+  {
+   "facing_id": "fc-5000-012-4-02",
+   "shelf_level_id": "sl-5000-012-4",
+   "facing_index": 2,
+   "facing_width_m": 0.13,
+   "max_units": 30,
+   "sku_code": "SKU-TEH-PCS-350",
+   "planogram_version": 1
+  },
+  {
+   "facing_id": "fc-5000-012-4-03",
+   "shelf_level_id": "sl-5000-012-4",
+   "facing_index": 3,
+   "facing_width_m": 0.13,
+   "max_units": 30,
+   "sku_code": "SKU-CCO-COLA-390",
+   "planogram_version": 1
+  },
+  {
+   "facing_id": "fc-5000-012-4-04",
+   "shelf_level_id": "sl-5000-012-4",
+   "facing_index": 4,
+   "facing_width_m": 0.13,
+   "max_units": 30,
+   "sku_code": "SKU-POC-SWE-500",
+   "planogram_version": 1
+  }
+ ],
+ "sample_skus": [
+  {
+   "sku_id": "sku-001",
+   "sku_code": "SKU-IDM-GRG-85",
+   "sku_name": "Indomie Goreng 85g",
+   "category_name": "方便面",
+   "subcategory": "油炸方便面",
+   "brand": "Indomie",
+   "unit_price": 3500,
+   "unit_cost": 2800,
+   "gross_margin": 0.2,
+   "shelf_life_days": 180,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.95,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-002",
+   "sku_code": "SKU-IDM-KRG-85",
+   "sku_name": "Indomie Kari Ayam 85g",
+   "category_name": "方便面",
+   "subcategory": "油炸方便面",
+   "brand": "Indomie",
+   "unit_price": 3500,
+   "unit_cost": 2800,
+   "gross_margin": 0.2,
+   "shelf_life_days": 180,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.95,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-003",
+   "sku_code": "SKU-IDM-SOP-85",
+   "sku_name": "Indomie Soto Betawi 85g",
+   "category_name": "方便面",
+   "subcategory": "油炸方便面",
+   "brand": "Indomie",
+   "unit_price": 3500,
+   "unit_cost": 2800,
+   "gross_margin": 0.2,
+   "shelf_life_days": 180,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.95,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-004",
+   "sku_code": "SKU-AQU-600",
+   "sku_name": "Aqua Mineral 600ml",
+   "category_name": "饮料",
+   "subcategory": "瓶装水",
+   "brand": "Aqua",
+   "unit_price": 4000,
+   "unit_cost": 2600,
+   "gross_margin": 0.35,
+   "shelf_life_days": 365,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-005",
+   "sku_code": "SKU-TEH-PCS-350",
+   "sku_name": "Teh Pucuk Harum 350ml",
+   "category_name": "饮料",
+   "subcategory": "茶饮料",
+   "brand": "Teh Pucuk",
+   "unit_price": 5000,
+   "unit_cost": 3200,
+   "gross_margin": 0.36,
+   "shelf_life_days": 270,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-006",
+   "sku_code": "SKU-CCO-COLA-390",
+   "sku_name": "Coca-Cola 390ml",
+   "category_name": "饮料",
+   "subcategory": "碳酸饮料",
+   "brand": "Coca-Cola",
+   "unit_price": 6500,
+   "unit_cost": 4500,
+   "gross_margin": 0.31,
+   "shelf_life_days": 270,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.4,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-007",
+   "sku_code": "SKU-POC-SWE-500",
+   "sku_name": "Pocari Sweat 500ml",
+   "category_name": "饮料",
+   "subcategory": "运动饮料",
+   "brand": "Pocari",
+   "unit_price": 8500,
+   "unit_cost": 6000,
+   "gross_margin": 0.29,
+   "shelf_life_days": 365,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.3,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-008",
+   "sku_code": "SKU-BRS-PRM-5KG",
+   "sku_name": "Beras Premium 5kg",
+   "category_name": "主食",
+   "subcategory": "大米",
+   "brand": "Beras Lokal",
+   "unit_price": 68000,
+   "unit_cost": 58000,
+   "gross_margin": 0.15,
+   "shelf_life_days": 365,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-009",
+   "sku_code": "SKU-MYK-BIM-1L",
+   "sku_name": "Minyak Goreng Bimoli 1L",
+   "category_name": "主食",
+   "subcategory": "食用油",
+   "brand": "Bimoli",
+   "unit_price": 22000,
+   "unit_cost": 18000,
+   "gross_margin": 0.18,
+   "shelf_life_days": 540,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-010",
+   "sku_code": "SKU-GUL-GLM-1KG",
+   "sku_name": "Gula Pasir Gulaku 1kg",
+   "category_name": "主食",
+   "subcategory": "糖",
+   "brand": "Gulaku",
+   "unit_price": 18000,
+   "unit_cost": 14000,
+   "gross_margin": 0.22,
+   "shelf_life_days": 730,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": true,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-011",
+   "sku_code": "SKU-AYM-FRS-1KG",
+   "sku_name": "Ayam Fresh 1kg",
+   "category_name": "生鲜",
+   "subcategory": "禽肉",
+   "brand": "Fresh Local",
+   "unit_price": 42000,
+   "unit_cost": 35000,
+   "gross_margin": 0.17,
+   "shelf_life_days": 3,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": false,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-012",
+   "sku_code": "SKU-SAP-FRS-500",
+   "sku_name": "Sapi Segar 500g",
+   "category_name": "生鲜",
+   "subcategory": "牛肉",
+   "brand": "Fresh Local",
+   "unit_price": 78000,
+   "unit_cost": 65000,
+   "gross_margin": 0.17,
+   "shelf_life_days": 3,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": false,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-013",
+   "sku_code": "SKU-IKN-KMB-500",
+   "sku_name": "Ikan Kembung Segar 500g",
+   "category_name": "生鲜",
+   "subcategory": "海鲜",
+   "brand": "Fresh Local",
+   "unit_price": 38000,
+   "unit_cost": 30000,
+   "gross_margin": 0.21,
+   "shelf_life_days": 2,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": false,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-014",
+   "sku_code": "SKU-UDR-FRS-1KG",
+   "sku_name": "Udang Segar 1kg",
+   "category_name": "生鲜",
+   "subcategory": "海鲜",
+   "brand": "Fresh Local",
+   "unit_price": 92000,
+   "unit_cost": 75000,
+   "gross_margin": 0.18,
+   "shelf_life_days": 2,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-015",
+   "sku_code": "SKU-SYR-BAY-500",
+   "sku_name": "Bayam Segar 500g",
+   "category_name": "生鲜",
+   "subcategory": "叶菜",
+   "brand": "Fresh Local",
+   "unit_price": 12000,
+   "unit_cost": 9500,
+   "gross_margin": 0.21,
+   "shelf_life_days": 3,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-016",
+   "sku_code": "SKU-PIS-CAV-1KG",
+   "sku_name": "Pisang Cavendish 1kg",
+   "category_name": "生鲜",
+   "subcategory": "水果",
+   "brand": "Fresh Local",
+   "unit_price": 28000,
+   "unit_cost": 22000,
+   "gross_margin": 0.21,
+   "shelf_life_days": 5,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-017",
+   "sku_code": "SKU-APL-FUJ-1KG",
+   "sku_name": "Apel Fuji 1kg",
+   "category_name": "生鲜",
+   "subcategory": "水果",
+   "brand": "Fresh Import",
+   "unit_price": 45000,
+   "unit_cost": 35000,
+   "gross_margin": 0.22,
+   "shelf_life_days": 14,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 0.0,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-018",
+   "sku_code": "SKU-ROT-TWR-500",
+   "sku_name": "Roti Tawar Sari Roti 500g",
+   "category_name": "烘焙",
+   "subcategory": "面包",
+   "brand": "Sari Roti",
+   "unit_price": 18000,
+   "unit_cost": 13500,
+   "gross_margin": 0.25,
+   "shelf_life_days": 7,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 0.95,
+   "mudik_sensitive": false,
+   "abc_class": "A"
+  },
+  {
+   "sku_id": "sku-019",
+   "sku_code": "SKU-KUE-BAS-500",
+   "sku_name": "Kue Basah Mix 500g",
+   "category_name": "烘焙",
+   "subcategory": "传统糕点",
+   "brand": "Fresh Local",
+   "unit_price": 35000,
+   "unit_cost": 25000,
+   "gross_margin": 0.29,
+   "shelf_life_days": 2,
+   "fresh_flag": true,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-020",
+   "sku_code": "SKU-NGT-FRZ-500",
+   "sku_name": "Nugget Fiesta 500g (Frozen)",
+   "category_name": "冷冻食品",
+   "subcategory": "冷冻肉制品",
+   "brand": "Fiesta",
+   "unit_price": 42000,
+   "unit_cost": 32000,
+   "gross_margin": 0.24,
+   "shelf_life_days": 365,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.85,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-021",
+   "sku_code": "SKU-ESK-WAL-1L",
+   "sku_name": "Es Krim Walls 1L (Frozen)",
+   "category_name": "冷冻食品",
+   "subcategory": "冰淇淋",
+   "brand": "Walls",
+   "unit_price": 52000,
+   "unit_cost": 38000,
+   "gross_margin": 0.27,
+   "shelf_life_days": 365,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.5,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-022",
+   "sku_code": "SKU-SBN-ALF-1L",
+   "sku_name": "Sunsilk Shampoo 1L",
+   "category_name": "个护",
+   "subcategory": "洗发水",
+   "brand": "Sunsilk",
+   "unit_price": 58000,
+   "unit_cost": 42000,
+   "gross_margin": 0.28,
+   "shelf_life_days": 1095,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.55,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-023",
+   "sku_code": "SKU-PPR-BTL-500",
+   "sku_name": "Pepsodent 500g",
+   "category_name": "个护",
+   "subcategory": "牙膏",
+   "brand": "Pepsodent",
+   "unit_price": 32000,
+   "unit_cost": 23000,
+   "gross_margin": 0.28,
+   "shelf_life_days": 1095,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.45,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-024",
+   "sku_code": "SKU-SAB-LIF-800",
+   "sku_name": "Lifebuoy Sabun Cair 800ml",
+   "category_name": "个护",
+   "subcategory": "沐浴露",
+   "brand": "Lifebuoy",
+   "unit_price": 45000,
+   "unit_cost": 33000,
+   "gross_margin": 0.27,
+   "shelf_life_days": 1095,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 0.5,
+   "mudik_sensitive": false,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-025",
+   "sku_code": "SKU-GAM-RMD-01",
+   "sku_name": "Gamis Ramadhan Premium",
+   "category_name": "服饰",
+   "subcategory": "穆斯林女装",
+   "brand": "Local Fashion",
+   "unit_price": 320000,
+   "unit_cost": 210000,
+   "gross_margin": 0.34,
+   "shelf_life_days": null,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": true,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-026",
+   "sku_code": "SKU-KKO-RMD-01",
+   "sku_name": "Koko Ramadhan Set",
+   "category_name": "服饰",
+   "subcategory": "穆斯林男装",
+   "brand": "Local Fashion",
+   "unit_price": 280000,
+   "unit_cost": 180000,
+   "gross_margin": 0.36,
+   "shelf_life_days": null,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": true,
+   "abc_class": "B"
+  },
+  {
+   "sku_id": "sku-027",
+   "sku_code": "SKU-SJD-PRM-01",
+   "sku_name": "Sajadah Premium",
+   "category_name": "服饰",
+   "subcategory": "穆斯林配饰",
+   "brand": "Local Fashion",
+   "unit_price": 180000,
+   "unit_cost": 110000,
+   "gross_margin": 0.39,
+   "shelf_life_days": null,
+   "fresh_flag": false,
+   "halal_certified": true,
+   "local_content_ratio": 1.0,
+   "mudik_sensitive": true,
+   "abc_class": "B"
+  }
+ ],
+ "ramadan_calendar_2026": {
+  "ramadan_start": "2026-02-19",
+  "lebaran_date": "2026-03-20",
+  "peak_date": "2026-03-13",
+  "mudik_peak_date": "2026-03-17",
+  "pre_replenishment_windows": [
+   {
+    "round": 1,
+    "start": "2026-01-01",
+    "end": "2026-01-15"
+   },
+   {
+    "round": 2,
+    "start": "2026-02-19",
+    "end": "2026-03-06"
+   }
+  ]
+ },
+ "generation_summary": {
+  "zones_count": 11,
+  "fixtures_count": 22,
+  "shelf_levels_count": 154,
+  "facings_count": 10920,
+  "skus_count": 34000,
+  "fresh_skus_count": 11220,
+  "halal_certified_skus_count": 28900,
+  "note": "sample_facings 与 sample_skus 仅展示前若干条，完整数据由 nrt seed 命令生成"
+ }
 }

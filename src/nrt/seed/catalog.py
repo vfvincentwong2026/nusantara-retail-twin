@@ -1,0 +1,161 @@
+"""SKU 品类目录：品类权重、品牌池、价格带、保质期。
+
+参数依据 docs/indonesia-market-notes.md 与 docs/store-scale-benchmarks.md
+中的印尼主流品类结构。
+"""
+
+from __future__ import annotations
+
+# key, 中文名, zone_type, fresh, 权重, 价格区间(IDR), 保质期天, 品牌池,
+# 斋月关联品类, 清真默认比例, Mudik 敏感概率
+CATEGORIES: list[dict] = [
+    {"key": "instant_noodles", "name": "方便面", "zone": "ambient", "fresh": False, "weight": 4,
+     "price": (2500, 5000), "shelf_life": 180, "brands": ["Indomie", "Mie Sedaap", "Pop Mie", "Sarimi"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.99, "mudik": 0.8},
+    {"key": "biscuits", "name": "饼干", "zone": "ambient", "fresh": False, "weight": 3,
+     "price": (5000, 20000), "shelf_life": 270, "brands": ["Oreo", "Khong Guan", "Roma", "Nissin"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.9, "mudik": 0.5},
+    {"key": "cooking_oil", "name": "食用油", "zone": "ambient", "fresh": False, "weight": 3,
+     "price": (20000, 60000), "shelf_life": 365, "brands": ["Bimoli", "Sania", "Filma", "Tropicana Slim"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.95, "mudik": 0.3},
+    {"key": "rice", "name": "大米", "zone": "ambient", "fresh": False, "weight": 4,
+     "price": (12000, 150000), "shelf_life": 365, "brands": ["Pulen", "Maknyuss", "Topi Koki", "Beras Rajawali"],
+     "seasonality": "ramadan", "related": "food", "halal": 1.0, "mudik": 0.5},
+    {"key": "seasoning", "name": "调味品", "zone": "ambient", "fresh": False, "weight": 3,
+     "price": (3000, 25000), "shelf_life": 720, "brands": ["Royco", "Sasa", "Indofood", "Kecap Bango"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.95, "mudik": 0.2},
+    {"key": "coffee", "name": "咖啡", "zone": "ambient", "fresh": False, "weight": 3,
+     "price": (5000, 45000), "shelf_life": 540, "brands": ["Kapal Api", "Torabika", "Nescafe", "Good Day"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.9, "mudik": 0.3},
+    {"key": "tea", "name": "茶", "zone": "ambient", "fresh": False, "weight": 2,
+     "price": (3000, 20000), "shelf_life": 540, "brands": ["Teh Pucuk", "Teh Sosro", "Sariwangi", "Tong Tji"],
+     "seasonality": "ramadan", "related": "beverages", "halal": 0.95, "mudik": 0.2},
+    {"key": "beverages", "name": "饮料", "zone": "ambient", "fresh": False, "weight": 5,
+     "price": (4000, 12000), "shelf_life": 270, "brands": ["Aqua", "Teh Pucuk", "Coca-Cola", "Pocari Sweat"],
+     "seasonality": "ramadan", "related": "beverages", "halal": 0.95, "mudik": 0.2},
+    {"key": "snacks", "name": "零食", "zone": "ambient", "fresh": False, "weight": 4,
+     "price": (2000, 15000), "shelf_life": 180, "brands": ["Chitato", "Taro", "Qtela", "Doritos"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.9, "mudik": 0.6},
+    {"key": "dairy", "name": "乳制品", "zone": "ambient", "fresh": False, "weight": 3,
+     "price": (5000, 30000), "shelf_life": 90, "brands": ["Ultramilk", "Indomilk", "Frisian Flag", "Cimory"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.95, "mudik": 0.2},
+    {"key": "frozen", "name": "冷冻食品", "zone": "frozen", "fresh": False, "weight": 3,
+     "price": (10000, 60000), "shelf_life": 365, "brands": ["Fiesta", "So Good", "Champ", "Belfoods"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.9, "mudik": 0.3},
+    {"key": "household_cleaning", "name": "清洁用品", "zone": "household", "fresh": False, "weight": 4,
+     "price": (5000, 40000), "shelf_life": 1095, "brands": ["Rinso", "Sunlight", "Baygon", "Molto"],
+     "seasonality": "ramadan", "related": "household", "halal": 0.8, "mudik": 0.0},
+    {"key": "personal_care", "name": "洗护用品", "zone": "household", "fresh": False, "weight": 4,
+     "price": (5000, 50000), "shelf_life": 1095, "brands": ["Lifebuoy", "Clear", "Pantene", "Dove"],
+     "seasonality": "none", "related": "household", "halal": 0.8, "mudik": 0.0},
+    {"key": "baby", "name": "母婴用品", "zone": "household", "fresh": False, "weight": 2,
+     "price": (15000, 150000), "shelf_life": 720, "brands": ["SGM", "Pampers", "MamyPoko", "Bebelac"],
+     "seasonality": "none", "related": "household", "halal": 0.7, "mudik": 0.0},
+    {"key": "kitchen", "name": "厨具家居", "zone": "household", "fresh": False, "weight": 2,
+     "price": (10000, 200000), "shelf_life": 1095, "brands": ["Lock&Lock", "Lion Star", "Miyako", "Oxone"],
+     "seasonality": "none", "related": "household", "halal": 0.5, "mudik": 0.0},
+    {"key": "fashion", "name": "穆斯林服饰", "zone": "fashion", "fresh": False, "weight": 4,
+     "price": (50000, 500000), "shelf_life": 1095, "brands": ["Rabbani", "Zoya", "Elzatta", "Nibras"],
+     "seasonality": "ramadan", "related": "fashion", "halal": 0.95, "mudik": 0.1},
+    {"key": "beauty", "name": "美妆个护", "zone": "ambient", "fresh": False, "weight": 2,
+     "price": (15000, 250000), "shelf_life": 1095, "brands": ["Wardah", "Pixy", "Make Over", "Eucerin"],
+     "seasonality": "ramadan", "related": "beauty", "halal": 0.85, "mudik": 0.0},
+    {"key": "electronics", "name": "小家电", "zone": "household", "fresh": False, "weight": 1,
+     "price": (50000, 2000000), "shelf_life": 730, "brands": ["Miyako", "Philips", "Cosmos", "Yong Ma"],
+     "seasonality": "ramadan", "related": "home_appliance", "halal": 0.6, "mudik": 0.0},
+    {"key": "stationery", "name": "文具", "zone": "household", "fresh": False, "weight": 1,
+     "price": (3000, 50000), "shelf_life": 1095, "brands": ["Faber-Castell", "Kenko", "Joyko", "Snowman"],
+     "seasonality": "harbolnas", "related": "none", "halal": 0.5, "mudik": 0.0},
+    # ---- 生鲜（fresh_flag=True）----
+    {"key": "fresh_vegetables", "name": "蔬菜", "zone": "fresh", "fresh": True, "weight": 3,
+     "price": (2000, 25000), "shelf_life": 5, "brands": ["本地农贸", "Sayurbox", "Tanihub"],
+     "seasonality": "ramadan", "related": "food", "halal": 1.0, "mudik": 0.1},
+    {"key": "fresh_fruits", "name": "水果", "zone": "fresh", "fresh": True, "weight": 3,
+     "price": (5000, 40000), "shelf_life": 7, "brands": ["本地农贸", "Sunpride", "Tropicana Fresh"],
+     "seasonality": "ramadan", "related": "food", "halal": 1.0, "mudik": 0.2},
+    {"key": "fresh_meat", "name": "鲜肉", "zone": "fresh", "fresh": True, "weight": 2,
+     "price": (30000, 120000), "shelf_life": 3, "brands": ["本地屠宰", "Bernardi", "Fiesta"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.98, "mudik": 0.2},
+    {"key": "fresh_seafood", "name": "海鲜", "zone": "fresh", "fresh": True, "weight": 2,
+     "price": (20000, 150000), "shelf_life": 2, "brands": ["本地渔场", "巴东海鲜"],
+     "seasonality": "ramadan", "related": "food", "halal": 0.9, "mudik": 0.1},
+    {"key": "eggs", "name": "鸡蛋", "zone": "fresh", "fresh": True, "weight": 2,
+     "price": (28000, 35000), "shelf_life": 21, "brands": ["本地农场", "Cimory", "JaFarms"],
+     "seasonality": "ramadan", "related": "food", "halal": 1.0, "mudik": 0.3},
+]
+
+# 品类内的子品类/规格变体
+VARIANTS: dict[str, list[str]] = {
+    "instant_noodles": ["Goreng 85g", "Kari Ayam 85g", "Soto 85g", "Aceh 85g", "Jumbo 129g"],
+    "biscuits": ["Original 300g", "Cokelat 280g", "Stik Keju 200g", "Sandwich 330g"],
+    "cooking_oil": ["2L 装", "1L 装", "5L 装"],
+    "rice": ["5kg 装", "10kg 装", "2.5kg 装", "25kg 装"],
+    "seasoning": ["Ayam 10g", "Sapi 10g", "Kaldu Jamur 8g", "Minyak Bawang 250ml"],
+    "coffee": ["Sachet 20×25g", "Bubuk 200g", "Kopi Susu 10×31g"],
+    "tea": ["Teh Celup 25×2g", "Teh Tubruk 200g", "Teb Kotak 500ml"],
+    "beverages": ["Botol 600ml", "Botol 1.5L", "Kaleng 320ml"],
+    "snacks": ["Rasa Sapi Panggang 68g", "Rasa Balado 75g", "Rasa Keju 60g"],
+    "dairy": ["Full Cream 1L", "Chocolate 200ml", "UHT 250ml×6"],
+    "frozen": ["Nugget 500g", "Sosis 300g", "Bakso 250g", "Dimsum 200g"],
+    "household_cleaning": ["Deterjen 800g", "Sabun Cuci 700ml", "Pembersih Lantai 800ml"],
+    "personal_care": ["Sabun Mandi 100g", "Shampoo 170ml", "Pasta Gigi 120g"],
+    "baby": ["Diapers M 20s", "Diapers L 16s", "Formula 400g"],
+    "kitchen": ["Wajan 28cm", "Panci 20cm", "Rice Cooker 1.8L"],
+    "fashion": ["Gamis Dewasa M", "Gamis Dewasa L", "Koko Lengan Pendek", "Hijab Segi Empat"],
+    "beauty": ["Lipstick Matte", "Bedak Tabur", "Serum 30ml"],
+    "electronics": ["Blender 1.5L", "Kipas Angin 12\"", "Setrika Listrik"],
+    "stationery": ["Pulpen Hitam", "Buku Tulis 58lbr", "Pensil 2B"],
+    "fresh_vegetables": ["Bayam 250g", "Kangkung 250g", "Wortel 500g", "Kentang 1kg", "Cabai Merah 250g", "Tomat 500g"],
+    "fresh_fruits": ["Pisang Cavendish 1kg", "Jeruk Medan 1kg", "Mangga Harum Manis 1kg", "Apel Fuji 1kg"],
+    "fresh_meat": ["Ayam Broiler 1kg", "Daging Sapi 500g", "Ceker Ayam 500g"],
+    "fresh_seafood": ["Ikan Kembung 500g", "Udang Segar 500g", "Cumi 500g"],
+    "eggs": ["Telur Ayam 1kg", "Telur Ayam Negeri 10pcs"],
+}
+
+# 区域 → 城市 / 坐标 / 配送中心距离范围
+REGION_PROFILES: dict[str, dict] = {
+    "java": {"cities": [("Jakarta", -6.2088, 106.8456), ("Bandung", -6.9175, 107.6191), ("Surabaya", -7.2575, 112.7521)],
+             "hub_km": (5, 30)},
+    "sumatra": {"cities": [("Medan", 3.5952, 98.6722), ("Palembang", -2.9761, 104.7754)],
+                "hub_km": (30, 120)},
+    "kalimantan": {"cities": [("Balikpapan", -1.2379, 116.8529), ("Pontianak", -0.0263, 109.3425)],
+                   "hub_km": (50, 200)},
+    "sulawesi": {"cities": [("Makassar", -5.1477, 119.4327), ("Manado", 1.4748, 124.8421)],
+                 "hub_km": (80, 300)},
+    "papua": {"cities": [("Jayapura", -2.5916, 140.6690), ("Sorong", -0.8762, 131.2558)],
+              "hub_km": (150, 500)},
+}
+
+# 门店规模基准（docs/data-model.md §7）
+SCALE_PARAMS: dict[int, dict] = {
+    500: {"format": "minimarket", "target_sku_count": 5000, "fixtures": 40, "layers": 5,
+          "facings": 1200, "fresh_ratio": 0.18, "halal_ratio": 0.95,
+          "footprint": (20, 25), "aisle_width_m": 2.0, "zones": 5},
+    2000: {"format": "supermarket", "target_sku_count": 14000, "fixtures": 120, "layers": 6,
+           "facings": 4320, "fresh_ratio": 0.28, "halal_ratio": 0.90,
+           "footprint": (40, 50), "aisle_width_m": 3.0, "zones": 8},
+    5000: {"format": "hypermarket", "target_sku_count": 34000, "fixtures": 260, "layers": 7,
+           "facings": 10920, "fresh_ratio": 0.33, "halal_ratio": 0.85,
+           "footprint": (50, 100), "aisle_width_m": 3.5, "zones": 11},
+}
+
+# 分区定义：名称 / 类型 / 货架权重（fixtures 占比）
+ZONES: list[dict] = [
+    {"name": "入口与促销区", "type": "promo", "weight": 0.06},
+    {"name": "饮料与零食区", "type": "ambient", "weight": 0.14},
+    {"name": "生鲜区", "type": "fresh", "weight": 0.16},
+    {"name": "食品杂货区", "type": "ambient", "weight": 0.18},
+    {"name": "日用品区", "type": "household", "weight": 0.10},
+    {"name": "冷冻食品区", "type": "frozen", "weight": 0.08},
+    {"name": "美妆个护区", "type": "ambient", "weight": 0.08},
+    {"name": "服饰区", "type": "fashion", "weight": 0.08},
+    {"name": "母婴用品区", "type": "household", "weight": 0.05},
+    {"name": "家居用品区", "type": "household", "weight": 0.05},
+    {"name": "收银与服务区", "type": "checkout", "weight": 0.02},
+]
+
+STORE_NAME_SUFFIX = {
+    "minimarket": ["社区店", "街角店", "便利店"],
+    "supermarket": ["标准店", "商圈店", "生活广场店"],
+    "hypermarket": ["大卖场", "旗舰店", "仓储店"],
+}

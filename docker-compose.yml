@@ -1,0 +1,23 @@
+# Nusantara Retail Twin — 本地依赖服务
+# Phase 2 仅需 Python + Node；数据库自 Phase 3（migrate）起需要。
+
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    container_name: nrt-db
+    environment:
+      POSTGRES_USER: nrt
+      POSTGRES_PASSWORD: nrt
+      POSTGRES_DB: nrt
+    ports:
+      - "5432:5432"
+    volumes:
+      - nrt-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nrt"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  nrt-db-data:

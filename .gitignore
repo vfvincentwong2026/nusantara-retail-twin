@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+
+# 全量种子数据（可通过 `nrt seed` 重新生成，不入库）
+data/seeds/*_full.json
+
+# 工作区与本地配置
+workspace/
+.env
+nrt.config.yaml
+
+# 前端
+web/*/node_modules/
+web/*/dist/

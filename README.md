@@ -199,13 +199,16 @@ nusantara-retail-twin/
 │       └── store_5000sqm.json
 ├── src/
 │   └── nrt/
-│       ├── model/                # 实体与数据模型
-│       ├── forecast/             # 需求预测引擎
-│       ├── replenishment/        # 补货引擎
-│       ├── space/                # 空间-存量优化
-│       ├── lifecycle/            # FEFO / 促销触发
-│       ├── sentiment/            # 舆情信号适配器
-│       └── calendar/             # 印尼节庆日历
+│       ├── model/                # 实体与数据模型（pydantic，对应 docs/data-model.md）
+│       ├── seed/                 # 全量种子数据生成器（nrt seed）
+│       ├── calendar/             # 印尼节庆日历（2026 官方日期）
+│       ├── twin.py               # RetailTwin 业务门面
+│       ├── cli/                  # nrt 命令行工具（seed / validate / calendar）
+│       ├── forecast/             # 需求预测引擎（Phase 4 接口预留）
+│       ├── replenishment/        # 补货引擎（Phase 5 接口预留）
+│       ├── space/                # 空间-存量优化（Phase 5 接口预留）
+│       ├── lifecycle/            # FEFO / 促销触发（Phase 6 接口预留）
+│       └── sentiment/            # 舆情信号适配器（Phase 6 接口预留）
 ├── web/
 │   ├── floorplan/                # 2D 平面图编辑器
 │   ├── three/                    # 3D 数字孪生渲染
@@ -241,39 +244,40 @@ nusantara-retail-twin/
 git clone https://github.com/YOUR_ORG/nusantara-retail-twin.git
 cd nusantara-retail-twin
 
-# 2. 启动依赖服务 / Start dependencies
+# 2. 安装并生成种子数据 / Install & seed
 cp .env.example .env
-docker compose up -d db
-
-# 3. 安装依赖并初始化 / Install & migrate
 make install
-make migrate
-make seed
+make seed          # 生成三档全量种子到 data/seeds/*_full.json（约 28MB，已 gitignore）
+
+# 3. （可选）启动数据库 / Start database（Phase 3 起需要）
+make db
+# make migrate     # Phase 3 提供
 
 # 4. 启动前后端 / Start frontend + backend
-make dev
+make dev           # Phase 4 提供 API；前端 Demo 见 Phase 3
 ```
 
-打开浏览器访问 `http://localhost:5173` 即可体验纯前端 Demo 模式。
+校验种子数据一致性：
+
+```bash
+make validate      # nrt validate 全量 + 样例种子文件
+```
 
 ### 生成一个 2,000㎡ 雅加达门店
 
+```bash
+nrt seed --store-size 2000 --region java --output ./data/seeds
+```
+
 ```python
-from nrt import StoreProfile, RetailTwin
+from nrt import RetailTwin
+from nrt.model import StoreSeed
 
-store = StoreProfile(
-    store_size_sqm=2000,
-    island_region="java",
-    target_sku_count=12000,
-    fresh_ratio=0.28,
-    qris_enabled=True,
-)
-
-twin = RetailTwin(store)
-twin.load_planogram()
-twin.forecast(horizon_days=30, include_ramadan=True)
-twin.replenish()
-twin.render_3d()
+# 加载已生成的全量种子（单一数据源：2D 平面图与 3D 场景共用）
+twin = RetailTwin.from_seed_file("./data/seeds/store_2000sqm_full.json")
+seed: StoreSeed = twin.seed
+print(seed.generation_summary)
+# forecast / replenish / optimize_space：Phase 4–5 解锁
 ```
 
 ---
@@ -283,7 +287,7 @@ twin.render_3d()
 | 阶段 / Phase | 内容 / Content | 状态 / Status |
 |---|---|---|
 | Phase 1 | 仓库初始化、README、统一数据模型 | ✅ 已完成 |
-| Phase 2 | 三档门店种子数据、2D 平面图编辑器 | 🔄 进行中 |
+| Phase 2 | 三档门店种子数据、2D 平面图编辑器 | 🔄 进行中（全量种子生成器 + nrt CLI ✅，2D 编辑器待启动） |
 | Phase 3 | 3D 数字孪生渲染（500 / 2000 / 5000㎡） | ⏳ 计划中 |
 | Phase 4 | 需求预测引擎（斋月 / Mudik / Harbolnas） | ⏳ 计划中 |
 | Phase 5 | 补货引擎 + 空间-存量 MILP 优化 | ⏳ 计划中 |

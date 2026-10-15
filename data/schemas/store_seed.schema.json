@@ -1,0 +1,747 @@
+{
+ "$defs": {
+  "ABCClass": {
+   "enum": [
+    "A",
+    "B",
+    "C"
+   ],
+   "title": "ABCClass",
+   "type": "string"
+  },
+  "Facing": {
+   "properties": {
+    "facing_id": {
+     "title": "Facing Id",
+     "type": "string"
+    },
+    "shelf_level_id": {
+     "title": "Shelf Level Id",
+     "type": "string"
+    },
+    "facing_index": {
+     "minimum": 1,
+     "title": "Facing Index",
+     "type": "integer"
+    },
+    "facing_width_m": {
+     "title": "Facing Width M",
+     "type": "number"
+    },
+    "max_units": {
+     "minimum": 0,
+     "title": "Max Units",
+     "type": "integer"
+    },
+    "sku_code": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Sku Code"
+    },
+    "planogram_version": {
+     "default": 1,
+     "title": "Planogram Version",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "facing_id",
+    "shelf_level_id",
+    "facing_index",
+    "facing_width_m",
+    "max_units"
+   ],
+   "title": "Facing",
+   "type": "object"
+  },
+  "Fixture": {
+   "properties": {
+    "fixture_id": {
+     "title": "Fixture Id",
+     "type": "string"
+    },
+    "zone_id": {
+     "title": "Zone Id",
+     "type": "string"
+    },
+    "fixture_type": {
+     "$ref": "#/$defs/FixtureType"
+    },
+    "fixture_label": {
+     "default": "",
+     "title": "Fixture Label",
+     "type": "string"
+    },
+    "position_x": {
+     "title": "Position X",
+     "type": "number"
+    },
+    "position_y": {
+     "title": "Position Y",
+     "type": "number"
+    },
+    "length_m": {
+     "title": "Length M",
+     "type": "number"
+    },
+    "height_m": {
+     "title": "Height M",
+     "type": "number"
+    },
+    "rotation_deg": {
+     "default": 0,
+     "title": "Rotation Deg",
+     "type": "number"
+    }
+   },
+   "required": [
+    "fixture_id",
+    "zone_id",
+    "fixture_type",
+    "position_x",
+    "position_y",
+    "length_m",
+    "height_m"
+   ],
+   "title": "Fixture",
+   "type": "object"
+  },
+  "FixtureType": {
+   "enum": [
+    "shelf",
+    "cooler",
+    "freezer",
+    "gondola",
+    "meat_counter",
+    "seafood_counter",
+    "produce_rack",
+    "bakery_counter",
+    "hot_food_counter"
+   ],
+   "title": "FixtureType",
+   "type": "string"
+  },
+  "GenerationSummary": {
+   "properties": {
+    "zones_count": {
+     "title": "Zones Count",
+     "type": "integer"
+    },
+    "fixtures_count": {
+     "title": "Fixtures Count",
+     "type": "integer"
+    },
+    "shelf_levels_count": {
+     "title": "Shelf Levels Count",
+     "type": "integer"
+    },
+    "facings_count": {
+     "title": "Facings Count",
+     "type": "integer"
+    },
+    "skus_count": {
+     "title": "Skus Count",
+     "type": "integer"
+    },
+    "fresh_skus_count": {
+     "title": "Fresh Skus Count",
+     "type": "integer"
+    },
+    "halal_certified_skus_count": {
+     "title": "Halal Certified Skus Count",
+     "type": "integer"
+    },
+    "note": {
+     "default": "",
+     "title": "Note",
+     "type": "string"
+    }
+   },
+   "required": [
+    "zones_count",
+    "fixtures_count",
+    "shelf_levels_count",
+    "facings_count",
+    "skus_count",
+    "fresh_skus_count",
+    "halal_certified_skus_count"
+   ],
+   "title": "GenerationSummary",
+   "type": "object"
+  },
+  "IslandRegion": {
+   "enum": [
+    "java",
+    "sumatra",
+    "kalimantan",
+    "sulawesi",
+    "papua"
+   ],
+   "title": "IslandRegion",
+   "type": "string"
+  },
+  "Point": {
+   "properties": {
+    "x": {
+     "title": "X",
+     "type": "number"
+    },
+    "y": {
+     "title": "Y",
+     "type": "number"
+    }
+   },
+   "required": [
+    "x",
+    "y"
+   ],
+   "title": "Point",
+   "type": "object"
+  },
+  "RamadanCalendar": {
+   "properties": {
+    "ramadan_start": {
+     "title": "Ramadan Start",
+     "type": "string"
+    },
+    "lebaran_date": {
+     "title": "Lebaran Date",
+     "type": "string"
+    },
+    "peak_date": {
+     "title": "Peak Date",
+     "type": "string"
+    },
+    "mudik_peak_date": {
+     "title": "Mudik Peak Date",
+     "type": "string"
+    },
+    "pre_replenishment_windows": {
+     "items": {
+      "additionalProperties": true,
+      "type": "object"
+     },
+     "title": "Pre Replenishment Windows",
+     "type": "array"
+    }
+   },
+   "required": [
+    "ramadan_start",
+    "lebaran_date",
+    "peak_date",
+    "mudik_peak_date",
+    "pre_replenishment_windows"
+   ],
+   "title": "RamadanCalendar",
+   "type": "object"
+  },
+  "SKU": {
+   "properties": {
+    "sku_id": {
+     "title": "Sku Id",
+     "type": "string"
+    },
+    "sku_code": {
+     "title": "Sku Code",
+     "type": "string"
+    },
+    "sku_name": {
+     "title": "Sku Name",
+     "type": "string"
+    },
+    "category_name": {
+     "title": "Category Name",
+     "type": "string"
+    },
+    "subcategory": {
+     "default": "",
+     "title": "Subcategory",
+     "type": "string"
+    },
+    "brand": {
+     "default": "",
+     "title": "Brand",
+     "type": "string"
+    },
+    "unit_price": {
+     "minimum": 0,
+     "title": "Unit Price",
+     "type": "number"
+    },
+    "unit_cost": {
+     "minimum": 0,
+     "title": "Unit Cost",
+     "type": "number"
+    },
+    "gross_margin": {
+     "anyOf": [
+      {
+       "maximum": 1,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Gross Margin"
+    },
+    "shelf_life_days": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Shelf Life Days"
+    },
+    "fresh_flag": {
+     "default": false,
+     "title": "Fresh Flag",
+     "type": "boolean"
+    },
+    "halal_certified": {
+     "default": false,
+     "title": "Halal Certified",
+     "type": "boolean"
+    },
+    "local_content_ratio": {
+     "anyOf": [
+      {
+       "maximum": 1,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Local Content Ratio"
+    },
+    "mudik_sensitive": {
+     "default": false,
+     "title": "Mudik Sensitive",
+     "type": "boolean"
+    },
+    "abc_class": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/ABCClass"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    }
+   },
+   "required": [
+    "sku_id",
+    "sku_code",
+    "sku_name",
+    "category_name",
+    "unit_price",
+    "unit_cost"
+   ],
+   "title": "SKU",
+   "type": "object"
+  },
+  "SeedMeta": {
+   "properties": {
+    "seed_version": {
+     "default": "0.2",
+     "title": "Seed Version",
+     "type": "string"
+    },
+    "generated_at": {
+     "format": "date-time",
+     "title": "Generated At",
+     "type": "string"
+    },
+    "store_size_sqm": {
+     "title": "Store Size Sqm",
+     "type": "integer"
+    },
+    "store_format": {
+     "$ref": "#/$defs/StoreFormat"
+    },
+    "island_region": {
+     "$ref": "#/$defs/IslandRegion"
+    },
+    "source": {
+     "default": "nrt seed",
+     "title": "Source",
+     "type": "string"
+    }
+   },
+   "required": [
+    "generated_at",
+    "store_size_sqm",
+    "store_format",
+    "island_region"
+   ],
+   "title": "SeedMeta",
+   "type": "object"
+  },
+  "ShelfLevel": {
+   "properties": {
+    "shelf_level_id": {
+     "title": "Shelf Level Id",
+     "type": "string"
+    },
+    "fixture_id": {
+     "title": "Fixture Id",
+     "type": "string"
+    },
+    "level_number": {
+     "minimum": 1,
+     "title": "Level Number",
+     "type": "integer"
+    },
+    "height_from_floor_m": {
+     "title": "Height From Floor M",
+     "type": "number"
+    },
+    "is_eye_level": {
+     "default": false,
+     "title": "Is Eye Level",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "shelf_level_id",
+    "fixture_id",
+    "level_number",
+    "height_from_floor_m"
+   ],
+   "title": "ShelfLevel",
+   "type": "object"
+  },
+  "StoreFormat": {
+   "enum": [
+    "minimarket",
+    "supermarket",
+    "hypermarket"
+   ],
+   "title": "StoreFormat",
+   "type": "string"
+  },
+  "StoreProfile": {
+   "properties": {
+    "store_id": {
+     "title": "Store Id",
+     "type": "string"
+    },
+    "store_name": {
+     "title": "Store Name",
+     "type": "string"
+    },
+    "store_size_sqm": {
+     "title": "Store Size Sqm",
+     "type": "integer"
+    },
+    "store_format": {
+     "$ref": "#/$defs/StoreFormat"
+    },
+    "island_region": {
+     "$ref": "#/$defs/IslandRegion"
+    },
+    "city": {
+     "default": "",
+     "title": "City",
+     "type": "string"
+    },
+    "latitude": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Latitude"
+    },
+    "longitude": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Longitude"
+    },
+    "target_sku_count": {
+     "default": 0,
+     "title": "Target Sku Count",
+     "type": "integer"
+    },
+    "sku_density": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Sku Density"
+    },
+    "fresh_ratio": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fresh Ratio"
+    },
+    "shelf_layers": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Shelf Layers"
+    },
+    "aisle_width_m": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Aisle Width M"
+    },
+    "qris_enabled": {
+     "default": false,
+     "title": "Qris Enabled",
+     "type": "boolean"
+    },
+    "supply_hub_distance_km": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Supply Hub Distance Km"
+    },
+    "lead_time_variance_days": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Lead Time Variance Days"
+    },
+    "mudik_offset": {
+     "default": 0,
+     "title": "Mudik Offset",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "store_id",
+    "store_name",
+    "store_size_sqm",
+    "store_format",
+    "island_region"
+   ],
+   "title": "StoreProfile",
+   "type": "object"
+  },
+  "Zone": {
+   "properties": {
+    "zone_id": {
+     "title": "Zone Id",
+     "type": "string"
+    },
+    "zone_name": {
+     "title": "Zone Name",
+     "type": "string"
+    },
+    "zone_type": {
+     "$ref": "#/$defs/ZoneType"
+    },
+    "heat_value": {
+     "maximum": 1,
+     "minimum": 0,
+     "title": "Heat Value",
+     "type": "number"
+    },
+    "polygon": {
+     "items": {
+      "$ref": "#/$defs/Point"
+     },
+     "title": "Polygon",
+     "type": "array"
+    }
+   },
+   "required": [
+    "zone_id",
+    "zone_name",
+    "zone_type",
+    "heat_value",
+    "polygon"
+   ],
+   "title": "Zone",
+   "type": "object"
+  },
+  "ZoneType": {
+   "enum": [
+    "fresh",
+    "ambient",
+    "frozen",
+    "household",
+    "fashion",
+    "promo",
+    "checkout"
+   ],
+   "title": "ZoneType",
+   "type": "string"
+  }
+ },
+ "description": "全量种子文档（nrt seed 生成）。\n\n兼容历史样例文档：若提供 sample_* 字段则视为样例。",
+ "properties": {
+  "meta": {
+   "$ref": "#/$defs/SeedMeta"
+  },
+  "store_profile": {
+   "$ref": "#/$defs/StoreProfile"
+  },
+  "zones": {
+   "items": {
+    "$ref": "#/$defs/Zone"
+   },
+   "title": "Zones",
+   "type": "array"
+  },
+  "fixtures": {
+   "items": {
+    "$ref": "#/$defs/Fixture"
+   },
+   "title": "Fixtures",
+   "type": "array"
+  },
+  "shelf_levels": {
+   "items": {
+    "$ref": "#/$defs/ShelfLevel"
+   },
+   "title": "Shelf Levels",
+   "type": "array"
+  },
+  "facings": {
+   "anyOf": [
+    {
+     "items": {
+      "$ref": "#/$defs/Facing"
+     },
+     "type": "array"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Facings"
+  },
+  "skus": {
+   "anyOf": [
+    {
+     "items": {
+      "$ref": "#/$defs/SKU"
+     },
+     "type": "array"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Skus"
+  },
+  "sample_facings": {
+   "anyOf": [
+    {
+     "items": {
+      "$ref": "#/$defs/Facing"
+     },
+     "type": "array"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Sample Facings"
+  },
+  "sample_skus": {
+   "anyOf": [
+    {
+     "items": {
+      "$ref": "#/$defs/SKU"
+     },
+     "type": "array"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Sample Skus"
+  },
+  "ramadan_calendar_2026": {
+   "$ref": "#/$defs/RamadanCalendar"
+  },
+  "generation_summary": {
+   "$ref": "#/$defs/GenerationSummary"
+  }
+ },
+ "required": [
+  "meta",
+  "store_profile",
+  "zones",
+  "fixtures",
+  "shelf_levels",
+  "ramadan_calendar_2026",
+  "generation_summary"
+ ],
+ "title": "Nusantara Retail Twin Store Seed",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

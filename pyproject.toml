@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nrt"
+version = "0.2.0"
+description = "Nusantara Retail Twin — 零售空间数字孪生与智能补货模拟引擎"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "typer>=0.12",
+    "rich>=13",
+    "pydantic>=2.5",
+    "PyYAML>=6.0",
+]
+
+[project.scripts]
+nrt = "nrt.cli.main:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
