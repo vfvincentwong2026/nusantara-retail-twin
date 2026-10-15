@@ -26,9 +26,13 @@ db:
 dev:
 	nrt serve --reload
 
-# 前端（Phase 3 起提供）
+# 前端 2D 平面图编辑器（web/，首次先 npm install）
 web:
-	@echo "web/ 尚未初始化（Phase 3）"
+	cd web && npm run dev -- --port 7100
+
+# 重新生成 web 演示种子数据
+web-seeds:
+	python scripts/gen_web_seeds.py
 
 # 印尼节庆日历速查
 calendar:

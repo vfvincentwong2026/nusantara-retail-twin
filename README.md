@@ -287,7 +287,7 @@ print(seed.generation_summary)
 | 阶段 / Phase | 内容 / Content | 状态 / Status |
 |---|---|---|
 | Phase 1 | 仓库初始化、README、统一数据模型 | ✅ 已完成 |
-| Phase 2 | 三档门店种子数据、2D 平面图编辑器 | 🔄 进行中（全量种子生成器 + nrt CLI ✅，2D 编辑器待启动） |
+| Phase 2 | 三档门店种子数据、2D 平面图编辑器 | 🔄 进行中（全量种子生成器 + nrt CLI + 2D 平面图编辑器 ✅） |
 | Phase 3 | 3D 数字孪生渲染（500 / 2000 / 5000㎡） | ⏳ 计划中 |
 | Phase 4 | 需求预测引擎（斋月 / Mudik / Harbolnas） | ⏳ 计划中 |
 | Phase 5 | 补货引擎 + 空间-存量 MILP 优化 | ⏳ 计划中 |
