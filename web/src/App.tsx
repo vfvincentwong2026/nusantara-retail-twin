@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { FacingEdit, SeedDoc } from '@/types/seed'
 import { downloadJSON, heatColor } from '@/lib/seed'
 import { loadSeed, STORE_SIZES } from '@/lib/seed'
@@ -7,8 +7,19 @@ import { Floorplan } from '@/components/Floorplan'
 import { Inspector } from '@/components/Inspector'
 import { Toaster, toast } from 'sonner'
 
+// 3D 视图按需加载（three.js 约 1MB，独立分包）
+const TwinScene = lazy(() =>
+  import('@/components/three/TwinScene').then((m) => ({ default: m.TwinScene })),
+)
+
+type ViewMode = '2d' | '3d'
+
 export default function App() {
   const [size, setSize] = useState<number>(STORE_SIZES[1])
+  const [view, setView] = useState<ViewMode>(() =>
+    new URLSearchParams(window.location.search).get('view') === '3d' ? '3d' : '2d',
+  )
+  const [autoRotate, setAutoRotate] = useState(false)
   const [doc, setDoc] = useState<SeedDoc | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -66,11 +77,54 @@ export default function App() {
     <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
       <div className="border-b border-slate-800 px-4 py-3">
         <TopBar doc={doc} size={size} loading={loading} error={error} onSwitchSize={setSize} />
+        <div className="mt-2 flex items-center gap-3">
+          <div className="flex rounded-lg border p-0.5">
+            {(['2d', '3d'] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                  v === view ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-slate-800'
+                }`}
+              >
+                {v === '2d' ? '2D 平面图' : '3D 数字孪生'}
+              </button>
+            ))}
+          </div>
+          {view === '3d' && (
+            <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={autoRotate}
+                onChange={(e) => setAutoRotate(e.target.checked)}
+                className="accent-sky-400"
+              />
+              自动旋转
+            </label>
+          )}
+        </div>
       </div>
       <div className="flex min-h-0 flex-1 gap-3 p-3">
         <main className="min-w-0 flex-1">
           {doc ? (
-            <Floorplan doc={doc} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} />
+            view === '2d' ? (
+              <Floorplan doc={doc} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} />
+            ) : (
+              <Suspense
+                fallback={
+                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                    加载 3D 引擎…
+                  </div>
+                }
+              >
+                <TwinScene
+                  doc={doc}
+                  selectedFixtureId={selectedFixtureId}
+                  onSelectFixture={setSelectedFixtureId}
+                  autoRotate={autoRotate}
+                />
+              </Suspense>
+            )
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
               {error ? '种子数据加载失败' : '加载种子数据…'}
@@ -89,6 +143,7 @@ export default function App() {
               <span className="inline-block h-3 w-3 rounded-sm bg-sky-400" /> 冷柜
               <span className="inline-block h-3 w-3 rounded-sm bg-indigo-400" /> 冷冻柜
             </span>
+            {view === '3d' && <span className="text-slate-600">面位色块 = 商品品类（与 2D 编辑器一致）</span>}
           </div>
         </main>
         <aside className="w-[420px] shrink-0">
