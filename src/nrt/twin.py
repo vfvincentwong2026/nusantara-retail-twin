@@ -57,14 +57,34 @@ class RetailTwin:
         return self.load_seed(path)
 
     # ------------------------------------------------------------------
-    # Phase 3-6：按契约预留（子包实现后解除 NotImplementedError）
+    # Phase 4：需求预测
     # ------------------------------------------------------------------
-    def forecast(self, horizon_days: int = 30, include_ramadan: bool = False):
-        from nrt.forecast import ForecastEngine
+    def forecast(
+        self,
+        horizon_days: int = 30,
+        include_ramadan: bool = False,
+        sku_count: int = 10,
+        history_days: int = 150,
+    ) -> list[dict]:
+        """对种子目录中的前 N 个 SKU 运行基线预测引擎。
 
-        return ForecastEngine(self.store).predict(
-            horizon_days=horizon_days, include_ramadan=include_ramadan
-        )
+        返回严格遵循 docs/architecture.md §4.1 输出契约的 DemandForecast 列表。
+        历史销售由 SalesHistorySimulator 合成，接入真实 POS 后替换数据源即可。
+        """
+        if self.seed is None or not self.seed.skus:
+            raise RuntimeError("请先 load_planogram() / load_seed() 加载含 SKU 目录的种子")
+        from nrt.forecast import ForecastEngine
+        from nrt.forecast.history import SalesHistorySimulator
+
+        targets = [s for s in self.seed.skus if s.abc_class and s.abc_class.value == "A"][:sku_count]
+        engine = ForecastEngine(self.store)
+        sim = SalesHistorySimulator(self.store, targets, seed=42)
+        events = sim.generate(days=history_days)
+        return [
+            engine.predict(s, [e for e in events if e["sku_id"] == s.sku_id],
+                           horizon_days=horizon_days, include_ramadan=include_ramadan)
+            for s in targets
+        ]
 
     def replenish(self, strategy: str = "auto"):
         from nrt.replenishment import ReplenishmentEngine

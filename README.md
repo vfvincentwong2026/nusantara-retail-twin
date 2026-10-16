@@ -289,7 +289,7 @@ print(seed.generation_summary)
 | Phase 1 | 仓库初始化、README、统一数据模型 | ✅ 已完成 |
 | Phase 2 | 三档门店种子数据、2D 平面图编辑器 | 🔄 进行中（全量种子生成器 + nrt CLI + 2D 平面图编辑器 ✅） |
 | Phase 3 | 3D 数字孪生渲染（500 / 2000 / 5000㎡） | 🔄 进行中（R3F 沙盘 + 2D/3D 联动 ✅，户外场景/动效待做） |
-| Phase 4 | 需求预测引擎（斋月 / Mudik / Harbolnas） | ⏳ 计划中 |
+| Phase 4 | 需求预测引擎（斋月 / Mudik / Harbolnas） | 🔄 进行中（基线引擎 + nrt forecast ✅，Prophet/LightGBM 待接） |
 | Phase 5 | 补货引擎 + 空间-存量 MILP 优化 | ⏳ 计划中 |
 | Phase 6 | 生命周期管理 + 舆情信号接入 | ⏳ 计划中 |
 | Phase 7 | Cloudflare Pages 部署、文档完善 | ⏳ 计划中 |
