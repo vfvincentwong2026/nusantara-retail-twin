@@ -16,6 +16,7 @@ Phase 2 实现 load_planogram / 种子加载；预测、补货、优化、
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 from typing import Optional, Union
 
@@ -86,12 +87,67 @@ class RetailTwin:
             for s in targets
         ]
 
-    def replenish(self, strategy: str = "auto"):
+    def replenish(
+        self,
+        strategy: str = "auto",
+        sku_count: int = 10,
+        today: Optional[date] = None,
+        seed: int = 42,
+    ) -> dict:
+        """预测 → 库存快照 → 补货决策的全链路编排。"""
+        import random as _random
+
+        if self.seed is None or not self.seed.skus:
+            raise RuntimeError("请先 load_planogram() / load_seed() 加载含 SKU 目录的种子")
+        from nrt.forecast import ForecastEngine
+        from nrt.forecast.history import SalesHistorySimulator
         from nrt.replenishment import ReplenishmentEngine
 
-        return ReplenishmentEngine(self.store).run(strategy=strategy)
+        targets = [s for s in self.seed.skus if s.abc_class and s.abc_class.value == "A"][:sku_count]
+        engine = ForecastEngine(self.store)
+        events = SalesHistorySimulator(self.store, targets, seed=seed).generate(days=150, end_date=today)
+        forecasts = {
+            s.sku_id: engine.predict(
+                s, [e for e in events if e["sku_id"] == s.sku_id],
+                horizon_days=30, include_ramadan=True, today=today,
+            )
+            for s in targets
+        }
+        rng = _random.Random(seed)
+        inventory = {
+            s.sku_id: round(forecasts[s.sku_id]["reorder_point"] * rng.uniform(0.0, 1.3))
+            for s in targets
+        }
+        return ReplenishmentEngine(self.store).run(targets, forecasts, inventory, strategy=strategy, today=today)
 
-    def optimize_space(self, objective: str = "balanced"):
+    def optimize_space(self, objective: str = "balanced") -> dict:
+        """品类 → 面位 MILP 优化（需先加载种子）。"""
+        if self.seed is None or not self.seed.skus:
+            raise RuntimeError("请先 load_planogram() / load_seed() 加载含 SKU 目录的种子")
         from nrt.space import SpaceOptimizer
 
-        return SpaceOptimizer(self.store).solve(objective=objective)
+        abc_turnover = {"A": 12.0, "B": 6.0, "C": 2.5}
+        cats: dict[str, dict] = {}
+        for s in self.seed.skus:
+            c = cats.setdefault(s.category_name, {"margins": [], "turnovers": [], "n": 0, "fresh": s.fresh_flag})
+            c["n"] += 1
+            c["margins"].append(s.gross_margin or 0.2)
+            c["turnovers"].append(abc_turnover[s.abc_class.value if s.abc_class else "C"])
+        categories = [
+            {
+                "category_id": name,
+                "sku_count": c["n"],
+                "avg_gross_margin": sum(c["margins"]) / len(c["margins"]),
+                "avg_daily_turnover": sum(c["turnovers"]) / len(c["turnovers"]),
+                "avg_facing_width_m": 0.2,
+                "min_facings_required": max(6, round(c["n"] * 0.01)),
+            }
+            for name, c in cats.items()
+        ]
+        return SpaceOptimizer(self.store).solve(
+            categories,
+            total_facings=self.seed.generation_summary.facings_count,
+            fresh_ratio_min=self.store.fresh_ratio or 0.0,
+            fresh_categories={n for n, c in cats.items() if c["fresh"]},
+            objective=objective,
+        )

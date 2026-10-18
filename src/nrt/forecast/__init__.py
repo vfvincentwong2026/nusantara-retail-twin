@@ -47,8 +47,13 @@ class ForecastEngine:
         today: Optional[date] = None,
     ) -> dict:
         """单 SKU 预测，输出严格遵循 §4.1 输出契约。"""
-        if len(historical_sales) < 90:
-            raise ValueError(f"历史数据不足 90 天：{len(historical_sales)} 天")
+        if historical_sales:
+            dates = sorted(date.fromisoformat(e["event_date"]) for e in historical_sales)
+            covered = (dates[-1] - dates[0]).days + 1
+            if covered < 90:
+                raise ValueError(f"历史数据不足 90 天：仅覆盖 {covered} 个日历日")
+        else:
+            raise ValueError("历史数据为空")
         today = today or date.today()
 
         by_dow: list[list[int]] = [[] for _ in range(7)]

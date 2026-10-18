@@ -10,6 +10,8 @@ import typer
 
 from nrt.cli.commands import calendar as calendar_cmd
 from nrt.cli.commands import forecast as forecast_cmd
+from nrt.cli.commands import optimize as optimize_cmd
+from nrt.cli.commands import replenish as replenish_cmd
 from nrt.cli.commands import seed as seed_cmd
 from nrt.cli.commands import validate as validate_cmd
 
@@ -23,8 +25,10 @@ app.command(name="seed", help="生成门店全量种子数据")(seed_cmd.seed)
 app.command(name="validate", help="校验种子数据与数据模型一致性")(validate_cmd.validate)
 app.command(name="calendar", help="查询印尼节庆日历")(calendar_cmd.calendar_cmd)
 app.command(name="forecast", help="运行需求预测引擎")(forecast_cmd.forecast)
+app.command(name="replenish", help="运行补货引擎")(replenish_cmd.replenish)
+app.command(name="optimize", help="运行空间-存量 MILP 优化")(optimize_cmd.optimize)
 
-# TODO(Phase 5-6)：migrate / replenish / optimize / simulate / serve / export / doctor
+# TODO(Phase 6)：migrate / simulate / serve / export / doctor
 
 
 def main() -> None:
