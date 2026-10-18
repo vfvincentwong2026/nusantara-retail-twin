@@ -3,12 +3,15 @@ import type { FacingEdit, SeedDoc } from '@/types/seed'
 import { FIXTURE_TYPE_LABEL, ZONE_TYPE_LABEL, formatIDR } from '@/lib/seed'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { DownloadIcon, ResetIcon, GridIcon, EyeIcon, SearchIcon } from '@/components/ui/icons'
+import { DownloadIcon, ResetIcon, GridIcon, EyeIcon, SearchIcon, BoxIcon } from '@/components/ui/icons'
+import { facingDelta, fmtIDR, type BizLayer } from '@/lib/biz'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface InspectorProps {
   doc: SeedDoc
+  biz: BizLayer
   fixtureId: string | null
   edits: Record<string, FacingEdit>
   onEdit: (facingId: string, edit: FacingEdit) => void
@@ -43,7 +46,25 @@ const CATEGORY_COLOR: Record<string, string> = {
   鸡蛋: '#eab308',
 }
 
-export function Inspector({ doc, fixtureId, edits, onEdit, onResetEdits, onExport, dirtyCount }: InspectorProps) {
+export function Inspector({ doc, biz, fixtureId, edits, onEdit, onResetEdits, onExport, dirtyCount }: InspectorProps) {
+  // 挪位沙盘：高潜未上架候选（拖拽源）
+  const candidates = useMemo(() => {
+    const placed = new Set(doc.facings.map((fc) => fc.sku_code).filter(Boolean))
+    return doc.skus
+      .filter((s) => !placed.has(s.sku_code) && (s.abc_class === 'A' || s.abc_class === 'B'))
+      .sort((a, b) => biz.skuMarginPerDay(b) - biz.skuMarginPerDay(a))
+      .slice(0, 8)
+  }, [doc])
+  const onDropSku = (facingId: string, maxUnits: number, skuCode: string) => {
+    const delta = facingDelta(doc, facingId, skuCode)
+    onEdit(facingId, { sku_code: skuCode, max_units: maxUnits })
+    const name = doc.skus.find((x) => x.sku_code === skuCode)?.sku_name ?? skuCode
+    if (delta >= 0) {
+      toast.success(`已应用：${name} → +${fmtIDR(delta)}/hari`)
+    } else {
+      toast.warning(`已应用：${name} → ${fmtIDR(delta)}/hari（毛利下降，建议回退）`)
+    }
+  }
   const [skuFilter, setSkuFilter] = useState('')
   const fixture = doc.fixtures.find((f) => f.fixture_id === fixtureId) ?? null
   const zone = fixture ? doc.zones.find((z) => z.zone_id === fixture.zone_id) : null
@@ -151,6 +172,12 @@ export function Inspector({ doc, fixtureId, edits, onEdit, onResetEdits, onExpor
                         onClick={() =>
                           document.getElementById(`row-${fc.facing_id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                         }
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault()
+                          const code = e.dataTransfer.getData('text/nrt-sku')
+                          if (code) onDropSku(fc.facing_id, fc.max_units, code)
+                        }}
                       />
                     )
                   })}
@@ -158,6 +185,27 @@ export function Inspector({ doc, fixtureId, edits, onEdit, onResetEdits, onExpor
               </div>
             )
           })}
+        </div>
+
+        {/* 挪位沙盘候选：拖到上方面位色块 */}
+        <div className="rounded-lg border ds-hairline p-2.5">
+          <p className="mb-1.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <BoxIcon className="h-3 w-3" />
+            挪位沙盘 · 高潜未上架候选（拖到面位色块）
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {candidates.map((c) => (
+              <span
+                key={c.sku_code}
+                draggable
+                onDragStart={(e) => e.dataTransfer.setData('text/nrt-sku', c.sku_code)}
+                title={`${c.sku_name} · ${fmtIDR(biz.skuMarginPerDay(c))}/hari`}
+                className="cursor-grab rounded-md border ds-hairline bg-muted/50 px-2 py-1 text-[11px] transition-colors hover:bg-muted active:cursor-grabbing"
+              >
+                {c.sku_name.slice(0, 16)}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* SKU 搜索 */}

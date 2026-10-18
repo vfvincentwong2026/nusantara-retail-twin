@@ -221,3 +221,17 @@ export function fmtIDR(v: number): string {
   if (v >= 1e6) return `Rp ${(v / 1e6).toFixed(1)} jt`
   return `Rp ${Math.round(v).toLocaleString('id-ID')}`
 }
+
+/** 单个面位替换 SKU 的日毛利增量（拖拽沙盘实时计算用） */
+export function facingDelta(doc: SeedDoc, facingId: string, newSkuCode: string): number {
+  const fc = doc.facings.find((f) => f.facing_id === facingId)
+  const sku = doc.skus.find((s) => s.sku_code === newSkuCode)
+  if (!fc || !sku) return 0
+  const level = doc.shelf_levels.find((l) => l.shelf_level_id === fc.shelf_level_id)
+  const fixture = doc.fixtures.find((f) => f.fixture_id === level?.fixture_id)
+  const zone = doc.zones.find((z) => z.zone_id === fixture?.zone_id)
+  const heat = zone?.heat_value ?? 0.5
+  const oldSku = fc.sku_code ? doc.skus.find((s) => s.sku_code === fc.sku_code) : null
+  const oldMargin = oldSku ? skuDailyMargin(oldSku) * heat : 0
+  return skuDailyMargin(sku) * heat - oldMargin
+}

@@ -179,9 +179,10 @@ export default function App() {
           </div>
         </main>
         <aside className={`w-[420px] shrink-0 ${demoMode ? 'hidden' : ''}`}>
-          {doc && (
+          {doc && biz && (
             <Inspector
               doc={doc}
+              biz={biz}
               fixtureId={selectedFixtureId}
               edits={edits}
               onEdit={onEdit}
