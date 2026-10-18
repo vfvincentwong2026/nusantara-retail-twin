@@ -112,3 +112,31 @@ class TestSynthPosBacktest(unittest.TestCase):
         result = runner.invoke(app, [
             "synth-pos", "-s", str(self.seed_file), "-d", "50"])
         self.assertEqual(result.exit_code, 2)
+
+
+class TestMigrateServe(unittest.TestCase):
+    def test_migrate_v02_to_v03(self):
+        with tempfile.TemporaryDirectory() as td:
+            old = Path(td) / "old.json"
+            old.write_text(json.dumps({"meta": {"seed_version": "0.2"}, "skus": []}), encoding="utf-8")
+            r = runner.invoke(app, ["migrate", str(old)])
+            self.assertEqual(r.exit_code, 0, r.output)
+            out = json.loads((Path(td) / "old_migrated.json").read_text(encoding="utf-8"))
+            self.assertEqual(out["meta"]["seed_version"], "0.3")
+            self.assertIn("sentiment_defaults", out["meta"])
+
+    def test_serve_health_and_seeds(self):
+        import threading, urllib.request
+        from nrt.cli.commands.serve import _Handler, SEEDS_DIR
+        from http.server import ThreadingHTTPServer
+        srv = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
+        t = threading.Thread(target=srv.serve_forever, daemon=True)
+        t.start()
+        port = srv.server_address[1]
+        try:
+            health = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/health").read())
+            self.assertTrue(health["ok"])
+            seeds = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/seeds").read())
+            self.assertIsInstance(seeds, list)
+        finally:
+            srv.shutdown()

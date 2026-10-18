@@ -14,9 +14,11 @@ from nrt.cli.commands import doctor as doctor_cmd
 from nrt.cli.commands import export as export_cmd
 from nrt.cli.commands import forecast as forecast_cmd
 from nrt.cli.commands import lifecycle as lifecycle_cmd
+from nrt.cli.commands import migrate as migrate_cmd
 from nrt.cli.commands import optimize as optimize_cmd
 from nrt.cli.commands import replenish as replenish_cmd
 from nrt.cli.commands import seed as seed_cmd
+from nrt.cli.commands import serve as serve_cmd
 from nrt.cli.commands import simulate as simulate_cmd
 from nrt.cli.commands import synthpos as synthpos_cmd
 from nrt.cli.commands import validate as validate_cmd
@@ -38,9 +40,11 @@ app.command(name="lifecycle", help="生命周期管理：FEFO/临期促销/斋�
 app.command(name="doctor", help="诊断运行环境：依赖、数据、契约文档")(doctor_cmd.doctor)
 app.command(name="export", help="导出种子数据子集（JSON / CSV）")(export_cmd.export)
 app.command(name="synth-pos", help="生成带缺货/促销/报损的合成 POS 数据")(synthpos_cmd.synthpos)
-app.command(name="backtest", help="预测精度回测：基线 vs Holt-DOW（walk-forward MAPE）")(backtest_cmd.backtest)
+app.command(name="backtest", help="预测精度回测：基线 vs Holt-DOW vs Croston（walk-forward MAPE）")(backtest_cmd.backtest)
+app.command(name="migrate", help="种子文件版本迁移（补字段、升 seed_version）")(migrate_cmd.migrate)
+app.command(name="serve", help="本地只读数据服务（agent-bridge 运行时入口）")(serve_cmd.serve)
 
-# TODO(Phase 6-7)：migrate / serve
+# CLI 15 令齐备
 
 
 def main() -> None:
