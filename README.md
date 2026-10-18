@@ -208,7 +208,7 @@ nusantara-retail-twin/
 │       ├── replenishment/        # 补货引擎（Phase 5 接口预留）
 │       ├── space/                # 空间-存量优化（Phase 5 接口预留）
 │       ├── lifecycle/            # FEFO / 促销触发（Phase 6 已落地）
-│       └── sentiment/            # 舆情信号适配器（Phase 6 接口预留）
+│       └── sentiment/            # 舆情信号适配器（Phase 6 已落地）
 ├── web/
 │   ├── floorplan/                # 2D 平面图编辑器
 │   ├── three/                    # 3D 数字孪生渲染
