@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
-import type { FacingEdit, SeedDoc } from '@/types/seed'
+import type { FacingEdit, FixtureEdit, SeedDoc } from '@/types/seed'
 import { downloadJSON, heatColor } from '@/lib/seed'
-import { computeBiz, fmtIDR, type BizLayer } from '@/lib/biz'
+import { computeBiz, facingDelta, fmtIDR, type BizLayer } from '@/lib/biz'
 import { loadSeed, STORE_SIZES } from '@/lib/seed'
 import { TopBar } from '@/components/TopBar'
 import { Floorplan } from '@/components/Floorplan'
@@ -27,6 +27,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [selectedFixtureId, setSelectedFixtureId] = useState<string | null>(null)
   const [edits, setEdits] = useState<Record<string, FacingEdit>>({})
+  const [fixtureEdits, setFixtureEdits] = useState<Record<string, FixtureEdit>>({})
 
   useEffect(() => {
     let cancelled = false
@@ -59,7 +60,15 @@ export default function App() {
     setEdits((prev) => ({ ...prev, [facingId]: edit }))
   }, [])
 
-  const onResetEdits = useCallback(() => setEdits({}), [])
+  const onResetEdits = useCallback(() => {
+    setEdits({})
+    setFixtureEdits({})
+  }, [])
+
+  const onMoveFixture = useCallback((id: string, x: number, y: number) => {
+    setFixtureEdits((prev) => ({ ...prev, [id]: { position_x: x, position_y: y } }))
+    toast.success(`货架已移动至 (${x.toFixed(1)}, ${y.toFixed(1)})m`)
+  }, [])
 
   const onExport = useCallback(() => {
     if (!doc) return
@@ -67,12 +76,22 @@ export default function App() {
       const e = edits[fc.facing_id]
       return e ? { ...fc, sku_code: e.sku_code, max_units: e.max_units } : fc
     })
-    const out = { ...doc, facings }
+    const fixtures = doc.fixtures.map((f) => ({ ...f, ...fixtureEdits[f.fixture_id] }))
+    const out = { ...doc, facings, fixtures }
+    const n = Object.keys(edits).length + Object.keys(fixtureEdits).length
     downloadJSON(out, `store_${size}sqm_edited.json`)
-    toast.success(`已导出 ${Object.keys(edits).length} 处修改`)
-  }, [doc, edits, size])
+    toast.success(`已导出 ${n} 处修改`)
+  }, [doc, edits, fixtureEdits, size])
 
-  const dirtyCount = Object.keys(edits).length
+  const dirtyCount = Object.keys(edits).length + Object.keys(fixtureEdits).length
+  const marginDelta = useMemo(() => {
+    if (!doc) return 0
+    let d = 0
+    for (const [facingId, e] of Object.entries(edits)) {
+      if (e.sku_code) d += facingDelta(doc, facingId, e.sku_code)
+    }
+    return d
+  }, [doc, edits])
   const heatLegend = useMemo(() => [0, 0.25, 0.5, 0.75, 1], [])
   const biz: BizLayer | null = useMemo(() => (doc ? computeBiz(doc) : null), [doc])
   // 演示模式：?demo=1 —— 洽谈第一屏（全屏坪效热力 + 挪位增收浮签）
@@ -139,7 +158,7 @@ export default function App() {
           )}
           {doc && biz ? (
             view === '2d' ? (
-              <Floorplan doc={doc} biz={biz} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} />
+              <Floorplan doc={doc} biz={biz} fixtureEdits={fixtureEdits} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} onMoveFixture={onMoveFixture} />
             ) : (
               <Suspense
                 fallback={
@@ -160,6 +179,15 @@ export default function App() {
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
               {error ? '种子数据加载失败' : '加载种子数据…'}
+            </div>
+          )}
+          {dirtyCount > 0 && (
+            <div className="mt-2 flex items-center gap-3 rounded-lg border ds-hairline bg-slate-900/70 px-3 py-1.5 text-xs backdrop-blur">
+              <span className="text-muted-foreground">本次调整对全店日毛利影响</span>
+              <span className={`num font-medium ${marginDelta >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {marginDelta >= 0 ? '+' : ''}{fmtIDR(marginDelta)}/hari
+              </span>
+              <span className="text-slate-600">（含 {Object.keys(fixtureEdits).length} 处货架移动 + {Object.keys(edits).length} 处面位调整）</span>
             </div>
           )}
           {/* 图例 */}

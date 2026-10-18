@@ -117,3 +117,9 @@ export interface FacingEdit {
   sku_code: string | null
   max_units: number
 }
+
+// 编辑器对 Fixture（货架）位置的本地修改（空间规划）
+export interface FixtureEdit {
+  position_x?: number
+  position_y?: number
+}

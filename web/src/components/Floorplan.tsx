@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import type { Fixture, SeedDoc, Zone } from '@/types/seed'
+import type { Fixture, FixtureEdit, SeedDoc, Zone } from '@/types/seed'
 import { FIXTURE_TYPE_COLOR, footprintOf } from '@/lib/seed'
 import { zoneBizColor, fmtIDR, type BizLayer } from '@/lib/biz'
 import { ResetIcon } from '@/components/ui/icons'
@@ -14,13 +14,17 @@ interface ViewBox {
 interface FloorplanProps {
   doc: SeedDoc
   biz: BizLayer
+  fixtureEdits: Record<string, FixtureEdit>
   selectedFixtureId: string | null
   onSelectFixture: (id: string | null) => void
+  onMoveFixture: (id: string, x: number, y: number) => void
 }
 
 const MARGIN = 4
 
-export function Floorplan({ doc, biz, selectedFixtureId, onSelectFixture }: FloorplanProps) {
+export function Floorplan({ doc, biz, fixtureEdits, selectedFixtureId, onSelectFixture, onMoveFixture }: FloorplanProps) {
+  const [dragPos, setDragPos] = useState<{ id: string; x: number; y: number } | null>(null)
+  const fixtureDrag = useRef<{ id: string; startX: number; startY: number; moved: boolean } | null>(null)
   const maxRank = Math.max(biz.zones.length - 1, 1)
   const svgRef = useRef<SVGSVGElement>(null)
   const [view, setView] = useState<ViewBox | null>(null)
@@ -126,16 +130,36 @@ export function Floorplan({ doc, biz, selectedFixtureId, onSelectFixture }: Floo
         {/* Fixture 层 */}
         {doc.fixtures.map((f: Fixture) => {
           const isSel = f.fixture_id === selectedFixtureId
+          const posEdit = fixtureEdits[f.fixture_id]
+          const posX = dragPos?.id === f.fixture_id ? dragPos.x : (posEdit?.position_x ?? f.position_x)
+          const posY = dragPos?.id === f.fixture_id ? dragPos.y : (posEdit?.position_y ?? f.position_y)
           const zone = zoneById.get(f.zone_id)
           return (
             <g
               key={f.fixture_id}
-              transform={`translate(${f.position_x}, ${f.position_y})`}
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => {
-                if (!drag.current?.moved) onSelectFixture(isSel ? null : f.fixture_id)
+              transform={`translate(${posX}, ${posY})`}
+              onPointerDown={(e) => {
+                e.stopPropagation()
+                ;(e.target as Element).setPointerCapture?.(e.pointerId)
+                const p = clientToSvg(e.clientX, e.clientY)
+                fixtureDrag.current = { id: f.fixture_id, startX: p.x - posX, startY: p.y - posY, moved: false }
               }}
-              className="cursor-pointer"
+              onPointerMove={(e) => {
+                if (!fixtureDrag.current || fixtureDrag.current.id !== f.fixture_id) return
+                const p = clientToSvg(e.clientX, e.clientY)
+                fixtureDrag.current.moved = true
+                setDragPos({ id: f.fixture_id, x: p.x - fixtureDrag.current.startX, y: p.y - fixtureDrag.current.startY })
+              }}
+              onPointerUp={() => {
+                if (fixtureDrag.current?.id === f.fixture_id && fixtureDrag.current.moved && dragPos) {
+                  onMoveFixture(f.fixture_id, Math.round(dragPos.x * 10) / 10, Math.round(dragPos.y * 10) / 10)
+                } else if (!fixtureDrag.current?.moved) {
+                  onSelectFixture(isSel ? null : f.fixture_id)
+                }
+                fixtureDrag.current = null
+                setDragPos(null)
+              }}
+              className={isSel ? 'cursor-move' : 'cursor-pointer'}
             >
               <title>{`${f.fixture_label} · ${zone?.zone_name ?? ''}`}</title>
               <rect
@@ -211,7 +235,7 @@ export function Floorplan({ doc, biz, selectedFixtureId, onSelectFixture }: Floo
         复位视图
       </button>
       <div className="pointer-events-none absolute left-3 top-3 text-[11px] text-slate-500">
-        拖动平移 · 滚轮缩放 · 点击货架查看面位
+        拖动平移 · 滚轮缩放 · 点击货架查看面位 · 选中货架可拖动改位置
       </div>
     </div>
   )
