@@ -292,7 +292,7 @@ print(seed.generation_summary)
 | Phase 4 | 需求预测引擎（斋月 / Mudik / Harbolnas） | 🔄 进行中（基线引擎 + nrt forecast ✅，Prophet/LightGBM 待接） |
 | Phase 5 | 补货引擎 + 空间-存量 MILP 优化 | 🔄 进行中（补货引擎 + nrt replenish + MILP 优化器 ✅） |
 | Phase 6 | 生命周期管理 + 舆情信号接入 | 🔄 进行中（lifecycle/sentiment 引擎已落地） |
-| Phase 7 | Cloudflare Pages 部署、文档完善 | 🔄 进行中（构建与 workflow 已验证） |
+| Phase 7 | Cloudflare Pages 部署、文档完善 | ✅ 已上线（nusantara-retail-twin.pages.dev，push 自动部署） |
 | Phase 8 | 印尼试点、真实数据接入、区域扩展 | ⏳ 计划中 |
 
 ---
