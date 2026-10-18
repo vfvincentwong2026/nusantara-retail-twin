@@ -10,6 +10,7 @@ import typer
 
 from nrt.cli.commands import calendar as calendar_cmd
 from nrt.cli.commands import forecast as forecast_cmd
+from nrt.cli.commands import lifecycle as lifecycle_cmd
 from nrt.cli.commands import optimize as optimize_cmd
 from nrt.cli.commands import replenish as replenish_cmd
 from nrt.cli.commands import seed as seed_cmd
@@ -29,8 +30,9 @@ app.command(name="forecast", help="运行需求预测引擎")(forecast_cmd.forec
 app.command(name="replenish", help="运行补货引擎")(replenish_cmd.replenish)
 app.command(name="optimize", help="运行空间-存量 MILP 优化")(optimize_cmd.optimize)
 app.command(name="simulate", help="运行完整模拟链路（seed→forecast→replenish→optimize）")(simulate_cmd.simulate)
+app.command(name="lifecycle", help="生命周期管理：FEFO/临期促销/斋月阶梯折扣")(lifecycle_cmd.lifecycle)
 
-# TODO(Phase 6)：migrate / serve / export / doctor
+# TODO(Phase 6-7)：migrate / serve / export / doctor / sentiment 接入
 
 
 def main() -> None:
