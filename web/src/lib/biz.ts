@@ -43,6 +43,7 @@ export interface BizLayer {
   bottomFacingIds: Set<string>
   whatIf: WhatIf[]
   totalDailyMargin: number
+  categoryMargins: { category: string; dailyMargin: number }[]
   skuMarginPerDay: (sku: SKU) => number
 }
 
@@ -205,8 +206,90 @@ export function computeBiz(doc: SeedDoc): BizLayer {
     bottomFacingIds,
     whatIf,
     totalDailyMargin: facingRows.reduce((s, r) => s + r.dailyMargin, 0),
+    categoryMargins: [...catAgg(facingRows)],
     skuMarginPerDay: skuDailyMargin,
   }
+}
+
+function catAgg(rows: { category: string; dailyMargin: number }[]) {
+  const m = new Map<string, number>()
+  for (const r of rows) m.set(r.category, (m.get(r.category) ?? 0) + r.dailyMargin)
+  return [...m.entries()]
+    .map(([category, dailyMargin]) => ({ category, dailyMargin }))
+    .sort((a, b) => b.dailyMargin - a.dailyMargin)
+}
+
+/**
+ * 一键智能优化（贪心 MILP 的静态前端版）：
+ * 对「品类内效率末位面位 × 未上架 A/B 高毛利 SKU」做全局正增量匹配，
+ * 返回可应用到 facings 的方案与总增收潜力。
+ */
+export function optimizePlan(doc: SeedDoc, maxEdits = 20): {
+  plan: Record<string, { sku_code: string; sku_name: string }>
+  totalDelta: number
+} {
+  const skuByCode = new Map(doc.skus.map((s) => [s.sku_code, s]))
+  const levelFixture = new Map(doc.shelf_levels.map((sl: ShelfLevel) => [sl.shelf_level_id, sl.fixture_id]))
+  const fixtureZone = new Map(doc.fixtures.map((f) => [f.fixture_id, f.zone_id]))
+  const zoneById = new Map(doc.zones.map((z) => [z.zone_id, z]))
+
+  const facingRows = doc.facings
+    .filter((fc: Facing) => fc.sku_code && skuByCode.has(fc.sku_code))
+    .map((fc: Facing) => {
+      const sku = skuByCode.get(fc.sku_code as string) as SKU
+      const zone = zoneById.get(
+        fixtureZone.get(levelFixture.get(fc.shelf_level_id) ?? '') ?? '',
+      )
+      const daily = skuDailyMargin(sku)
+      return {
+        facingId: fc.facing_id,
+        skuCode: fc.sku_code as string,
+        heat: zone?.heat_value ?? 0.5,
+        widthM: fc.facing_width_m,
+        dailyMargin: daily,
+        marginPerM: daily / Math.max(fc.facing_width_m, 0.01),
+        weightedMargin: daily * (zone?.heat_value ?? 0.5),
+        category: sku.category_name,
+      }
+    })
+
+  const catVals = new Map<string, number[]>()
+  for (const r of facingRows) {
+    const arr = catVals.get(r.category) ?? []
+    arr.push(r.marginPerM)
+    catVals.set(r.category, arr)
+  }
+  const catMean = new Map<string, number>()
+  catVals.forEach((arr, c) => catMean.set(c, arr.reduce((s, v) => s + v, 0) / arr.length))
+  const withEff = facingRows.map((r) => ({
+    ...r,
+    efficiency: r.marginPerM / (catMean.get(r.category) || 1) || 1,
+  }))
+
+  const placed = new Set(facingRows.map((r) => r.skuCode))
+  const candidates = doc.skus
+    .filter((s) => !placed.has(s.sku_code) && (s.abc_class === 'A' || s.abc_class === 'B'))
+    .sort((a, b) => skuDailyMargin(b) - skuDailyMargin(a))
+  const bottom = [...withEff].sort((a, b) => a.efficiency - b.efficiency)
+
+  const plan: Record<string, { sku_code: string; sku_name: string }> = {}
+  const usedTargets = new Set<string>()
+  let totalDelta = 0
+  for (const c of candidates) {
+    if (Object.keys(plan).length >= maxEdits) break
+    const cMargin = skuDailyMargin(c)
+    for (const t of bottom) {
+      if (usedTargets.has(t.facingId)) continue
+      const delta = cMargin * t.heat - t.weightedMargin
+      if (delta > 0) {
+        usedTargets.add(t.facingId)
+        plan[t.facingId] = { sku_code: c.sku_code, sku_name: c.sku_name }
+        totalDelta += delta
+        break
+      }
+    }
+  }
+  return { plan, totalDelta: Math.round(totalDelta) }
 }
 
 /** 坪效 → 连续色（单色相 emerald，透明度阶梯，Kimi 顺序色规范） */

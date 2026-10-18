@@ -6,7 +6,8 @@ import { loadSeed, STORE_SIZES } from '@/lib/seed'
 import { TopBar } from '@/components/TopBar'
 import { Floorplan } from '@/components/Floorplan'
 import { Inspector } from '@/components/Inspector'
-import { MapIcon, CubeIcon, RotateIcon } from '@/components/ui/icons'
+import { Dashboard } from '@/components/Dashboard'
+import { MapIcon, CubeIcon, RotateIcon, ChartIcon } from '@/components/ui/icons'
 import { Toaster, toast } from 'sonner'
 
 // 3D 视图按需加载（three.js 约 1MB，独立分包）
@@ -14,13 +15,16 @@ const TwinScene = lazy(() =>
   import('@/components/three/TwinScene').then((m) => ({ default: m.TwinScene })),
 )
 
-type ViewMode = '2d' | '3d'
+type ViewMode = '2d' | '3d' | 'dash'
+
+const VIEW_FROM_URL = (): ViewMode => {
+  const v = new URLSearchParams(window.location.search).get('view')
+  return v === '3d' ? '3d' : v === 'dash' ? 'dash' : '2d'
+}
 
 export default function App() {
   const [size, setSize] = useState<number>(STORE_SIZES[1])
-  const [view, setView] = useState<ViewMode>(() =>
-    new URLSearchParams(window.location.search).get('view') === '3d' ? '3d' : '2d',
-  )
+  const [view, setView] = useState<ViewMode>(VIEW_FROM_URL)
   const [autoRotate, setAutoRotate] = useState(false)
   const [doc, setDoc] = useState<SeedDoc | null>(null)
   const [loading, setLoading] = useState(false)
@@ -107,6 +111,7 @@ export default function App() {
               [
                 { v: '2d', label: '2D 平面图', Icon: MapIcon },
                 { v: '3d', label: '3D 数字孪生', Icon: CubeIcon },
+                { v: 'dash', label: '经营大屏', Icon: ChartIcon },
               ] as const
             ).map(({ v, label, Icon }) => (
               <button
@@ -159,6 +164,12 @@ export default function App() {
           {doc && biz ? (
             view === '2d' ? (
               <Floorplan doc={doc} biz={biz} fixtureEdits={fixtureEdits} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} onMoveFixture={onMoveFixture} />
+            ) : view === 'dash' ? (
+              <Dashboard
+                doc={doc}
+                biz={biz}
+                onApplyPlan={(batch) => setEdits((prev) => ({ ...prev, ...batch }))}
+              />
             ) : (
               <Suspense
                 fallback={
@@ -206,7 +217,7 @@ export default function App() {
             {view === '3d' && <span className="text-slate-600">面位色块 = 商品品类（与 2D 编辑器一致）</span>}
           </div>
         </main>
-        <aside className={`w-[420px] shrink-0 ${demoMode ? 'hidden' : ''}`}>
+        <aside className={`w-[420px] shrink-0 ${demoMode || view === 'dash' ? 'hidden' : ''}`}>
           {doc && biz && (
             <Inspector
               doc={doc}

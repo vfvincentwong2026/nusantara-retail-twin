@@ -140,6 +140,14 @@ export function SearchIcon(props: IconProps) {
   )
 }
 
+export function ChartIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M4 20V10M10 20V4M16 20v-8M21 20H3" />
+    </svg>
+  )
+}
+
 export const ICON = {
   store: StoreIcon,
   box: BoxIcon,
