@@ -6,9 +6,11 @@ pages_build_output_dir = "dist"
 ENVIRONMENT = "production"
 API_BASE_URL = "https://api.nusantara-retail-twin.pages.dev"
 
-[[kv_namespaces]]
-binding = "NRT_CACHE"
-id = "REPLACE_WITH_KV_ID"
+# 需要边缘缓存时，先在 Cloudflare 创建 KV 命名空间，
+# 再取消下方注释并把 id 替换为真实命名空间 ID：
+# [[kv_namespaces]]
+# binding = "NRT_CACHE"
+# id = "REPLACE_WITH_KV_ID"
 
 [observability]
 enabled = true
