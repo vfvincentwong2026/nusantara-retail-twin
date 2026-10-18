@@ -73,3 +73,42 @@ class TestExport(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSynthPosBacktest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.seed_file = Path(cls.tmp.name) / "seed.json"
+        cls.seed_file.write_text(
+            json.dumps(SeedGenerator(store_size=500, region="java", seed=7).generate(),
+                       ensure_ascii=False),
+            encoding="utf-8")
+        cls.pos_file = Path(cls.tmp.name) / "pos.json"
+        result = runner.invoke(app, [
+            "synth-pos", "-s", str(cls.seed_file), "-d", "120",
+            "-o", str(cls.tmp.name)])
+        assert result.exit_code == 0, result.output
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_pos_structure(self):
+        pos = json.loads(self.pos_file.read_text(encoding="utf-8"))
+        self.assertIn("sales", pos)
+        self.assertIn("wastage", pos)
+        self.assertGreater(pos["summary"]["sale_events"], 0)
+        self.assertGreaterEqual(pos["summary"]["censored_days"], 0)
+
+    def test_backtest_runs(self):
+        result = runner.invoke(app, [
+            "backtest", str(self.pos_file), "-s", str(self.seed_file),
+            "--sku-limit", "20"])
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("MAPE", result.output)
+
+    def test_synth_pos_min_days_guard(self):
+        result = runner.invoke(app, [
+            "synth-pos", "-s", str(self.seed_file), "-d", "50"])
+        self.assertEqual(result.exit_code, 2)

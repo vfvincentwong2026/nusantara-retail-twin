@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import typer
 
+from nrt.cli.commands import backtest as backtest_cmd
 from nrt.cli.commands import calendar as calendar_cmd
 from nrt.cli.commands import doctor as doctor_cmd
 from nrt.cli.commands import export as export_cmd
@@ -17,6 +18,7 @@ from nrt.cli.commands import optimize as optimize_cmd
 from nrt.cli.commands import replenish as replenish_cmd
 from nrt.cli.commands import seed as seed_cmd
 from nrt.cli.commands import simulate as simulate_cmd
+from nrt.cli.commands import synthpos as synthpos_cmd
 from nrt.cli.commands import validate as validate_cmd
 
 app = typer.Typer(
@@ -35,8 +37,10 @@ app.command(name="simulate", help="运行完整模拟链路（seed→forecast→
 app.command(name="lifecycle", help="生命周期管理：FEFO/临期促销/斋月阶梯折扣")(lifecycle_cmd.lifecycle)
 app.command(name="doctor", help="诊断运行环境：依赖、数据、契约文档")(doctor_cmd.doctor)
 app.command(name="export", help="导出种子数据子集（JSON / CSV）")(export_cmd.export)
+app.command(name="synth-pos", help="生成带缺货/促销/报损的合成 POS 数据")(synthpos_cmd.synthpos)
+app.command(name="backtest", help="预测精度回测：基线 vs Holt-DOW（walk-forward MAPE）")(backtest_cmd.backtest)
 
-# TODO(Phase 6-7)：migrate / serve / sentiment 接入
+# TODO(Phase 6-7)：migrate / serve
 
 
 def main() -> None:

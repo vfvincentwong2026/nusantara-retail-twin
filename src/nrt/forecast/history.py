@@ -104,6 +104,61 @@ class SalesHistorySimulator:
                 day += timedelta(days=1)
         return events
 
+    def generate_pos(
+        self,
+        days: int = 365,
+        end_date: Optional[date] = None,
+        stockout_rate: float = 0.03,
+        promo_rate: float = 0.02,
+        wastage_rate: float = 0.05,
+    ) -> dict:
+        """生成带「真实 POS 脏特征」的合成数据（Phase 8 试点演练用）。
+
+        在 generate() 的事件流基础上叠加：
+        - 缺货删失：按 stockout_rate 丢失整天销售（POS 里是 0，不是低需求）
+        - 促销尖峰：按 promo_rate 注入 ×1.8 促销日（promotion_flag=True）
+        - 生鲜报损：按 wastage_rate 生成 wastage 记录（复盘损耗率用）
+        """
+        sales = self.generate(days=days, end_date=end_date)
+        rng = random.Random(self.rng.random())
+        fresh_ids = {s.sku_id for s in self.skus if s.fresh_flag}
+
+        censored = [e for e in sales if rng.random() < stockout_rate]
+        for e in censored:
+            e["quantity_sold"] = 0  # 删失：当天 POS 显示 0，真需求未知
+            e["censored"] = True
+
+        promoted = [e for e in sales if not e.get("censored") and rng.random() < promo_rate]
+        for e in promoted:
+            e["quantity_sold"] = int(round(e["quantity_sold"] * 1.8))
+            e["promotion_flag"] = True
+            e["promotion_type"] = "instore_bundle"
+
+        wastage = []
+        for e in sales:
+            if e["sku_id"] in fresh_ids and e["quantity_sold"] > 0 and rng.random() < wastage_rate:
+                wastage.append(
+                    {
+                        "store_id": e["store_id"],
+                        "sku_id": e["sku_id"],
+                        "event_date": e["event_date"],
+                        "quantity_wasted": max(1, int(round(e["quantity_sold"] * rng.uniform(0.05, 0.3)))),
+                        "reason": "expiry",
+                    }
+                )
+        return {
+            "store_id": self.store.store_id,
+            "days": days,
+            "sales": sorted(sales, key=lambda e: (e["sku_id"], e["event_date"])),
+            "wastage": wastage,
+            "summary": {
+                "sale_events": len(sales),
+                "censored_days": len(censored),
+                "promo_events": len(promoted),
+                "wastage_events": len(wastage),
+            },
+        }
+
 
 def _poisson(rng: random.Random, lam: float) -> int:
     """Knuth 泊松采样；lam 较大时用高斯近似（带 cv 放大尾部）。"""
