@@ -25,3 +25,12 @@
 - Cloudflare Pages 上线：nusantara-retail-twin.pages.dev，push 自动部署
 - 修复 CI：`cloudflare/pages-action`（已下线）→ `wrangler pages deploy` CLI
 - GitHub 首次 push（12 提交）；secrets 配置指引完成
+
+## 补充（同日）· 呈现层全面补齐（PM 检讨后）
+
+- 根因：引擎先行、呈现补票——空间价值算出来但画布上看不见
+- 新 `web/src/lib/biz.ts` 业务图层：镜像 SpaceAnalyzer（坪效/末位面位/what-if）到前端
+- 2D：分区坪效连续热力（标签直显 Rp/㎡/日）、末位 10% 面位货架红描边、选中货架显示日毛利+毛利排名
+- 3D：地面分区按坪效着色、末位货架红色警示
+- 演示模式 `?demo=1`：全屏坪效热力 + 总日毛利 + 挪位增收浮签（洽谈第一屏，隐藏编辑器）
+- 周报 HTML 加三张 SVG 图：分区坪效条形图 / 订单优先级环形图 / 临期倒计时条

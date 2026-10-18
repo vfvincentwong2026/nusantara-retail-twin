@@ -3,10 +3,12 @@ import { useFrame } from '@react-three/fiber'
 import { Instance, Instances, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import type { Facing, SeedDoc, ShelfLevel } from '@/types/seed'
-import { FIXTURE_TYPE_COLOR, heatColor } from '@/lib/seed'
+import { FIXTURE_TYPE_COLOR } from '@/lib/seed'
+import { zoneBizColor, type BizLayer } from '@/lib/biz'
 
 interface StoreMeshProps {
   doc: SeedDoc
+  biz: BizLayer
   selectedFixtureId: string | null
   onSelectFixture: (id: string | null) => void
   autoRotate: boolean
@@ -59,7 +61,8 @@ function zoneRect(z: SeedDoc['zones'][number]) {
   }
 }
 
-export function StoreMesh({ doc, selectedFixtureId, onSelectFixture, autoRotate }: StoreMeshProps) {
+export function StoreMesh({ doc, biz, selectedFixtureId, onSelectFixture, autoRotate }: StoreMeshProps) {
+  const maxRank = Math.max(biz.zones.length - 1, 1)
   const group = useRef<THREE.Group>(null)
 
   const skuColor = useMemo(() => {
@@ -152,7 +155,11 @@ export function StoreMesh({ doc, selectedFixtureId, onSelectFixture, autoRotate 
         return (
           <mesh key={z.zone_id} position={[r.cx, 0.015, r.cz]}>
             <boxGeometry args={[r.w - 0.15, 0.03, r.d - 0.15]} />
-            <meshStandardMaterial color={heatColor(z.heat_value, 0.85)} transparent opacity={0.55} />
+            <meshStandardMaterial
+              color={zoneBizColor((biz.zones.find((b) => b.zone.zone_id === z.zone_id)?.rank ?? 0) / maxRank)}
+              transparent
+              opacity={0.75}
+            />
           </mesh>
         )
       })}
@@ -192,7 +199,13 @@ export function StoreMesh({ doc, selectedFixtureId, onSelectFixture, autoRotate 
             >
               <boxGeometry args={[f.length_m, h, 0.62]} />
               <meshStandardMaterial
-                color={isSel ? '#f8fafc' : (FIXTURE_TYPE_COLOR[f.fixture_type] ?? '#94a3b8')}
+                color={
+                  isSel
+                    ? '#f8fafc'
+                    : biz.fixtures.get(f.fixture_id)?.isBottom
+                      ? '#f87171'
+                      : (FIXTURE_TYPE_COLOR[f.fixture_type] ?? '#94a3b8')
+                }
                 transparent
                 opacity={isSel ? 0.95 : 0.32}
               />

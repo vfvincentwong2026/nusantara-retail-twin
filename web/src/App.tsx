@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { FacingEdit, SeedDoc } from '@/types/seed'
 import { downloadJSON, heatColor } from '@/lib/seed'
+import { computeBiz, fmtIDR, type BizLayer } from '@/lib/biz'
 import { loadSeed, STORE_SIZES } from '@/lib/seed'
 import { TopBar } from '@/components/TopBar'
 import { Floorplan } from '@/components/Floorplan'
@@ -73,6 +74,9 @@ export default function App() {
 
   const dirtyCount = Object.keys(edits).length
   const heatLegend = useMemo(() => [0, 0.25, 0.5, 0.75, 1], [])
+  const biz: BizLayer | null = useMemo(() => (doc ? computeBiz(doc) : null), [doc])
+  // 演示模式：?demo=1 —— 洽谈第一屏（全屏坪效热力 + 挪位增收浮签）
+  const demoMode = useMemo(() => new URLSearchParams(window.location.search).get('demo') === '1', [])
 
   return (
     <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
@@ -115,10 +119,27 @@ export default function App() {
         </div>
       </div>
       <div className="flex min-h-0 flex-1 gap-3 p-3">
-        <main className="min-w-0 flex-1">
-          {doc ? (
+        <main className="relative min-w-0 flex-1">
+          {doc && biz && demoMode && (
+            <div className="pointer-events-none absolute right-4 top-4 z-10 w-72 space-y-2">
+              <div className="rounded-lg border ds-hairline bg-slate-900/85 px-3.5 py-3 backdrop-blur">
+                <p className="text-[11px] text-slate-400">总日毛利（全店面位合计）</p>
+                <p className="num text-lg font-medium text-emerald-400">{fmtIDR(biz.totalDailyMargin)}/hari</p>
+              </div>
+              {biz.whatIf.map((w) => (
+                <div key={w.facing_id} className="rounded-lg border ds-hairline bg-slate-900/85 px-3.5 py-2.5 backdrop-blur">
+                  <p className="text-xs text-slate-200">挪位增收 #{biz.whatIf.indexOf(w) + 1}</p>
+                  <p className="truncate text-[11px] text-slate-400">{w.to_sku_name}</p>
+                  <p className="num text-sm font-medium text-emerald-400">
+                    +{fmtIDR(w.delta_daily_margin_idr)}/hari
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+          {doc && biz ? (
             view === '2d' ? (
-              <Floorplan doc={doc} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} />
+              <Floorplan doc={doc} biz={biz} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} />
             ) : (
               <Suspense
                 fallback={
@@ -129,6 +150,7 @@ export default function App() {
               >
                 <TwinScene
                   doc={doc}
+                  biz={biz}
                   selectedFixtureId={selectedFixtureId}
                   onSelectFixture={setSelectedFixtureId}
                   autoRotate={autoRotate}
@@ -156,7 +178,7 @@ export default function App() {
             {view === '3d' && <span className="text-slate-600">面位色块 = 商品品类（与 2D 编辑器一致）</span>}
           </div>
         </main>
-        <aside className="w-[420px] shrink-0">
+        <aside className={`w-[420px] shrink-0 ${demoMode ? 'hidden' : ''}`}>
           {doc && (
             <Inspector
               doc={doc}

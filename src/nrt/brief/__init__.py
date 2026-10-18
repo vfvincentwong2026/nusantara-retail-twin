@@ -107,11 +107,71 @@ def build_brief(
         "orders": need[:top_orders],
         "order_summary": orders["summary"],
         "space_what_if": space["what_if_top"],
+        "zone_ranking": space["zone_ranking"][:7],
         "zone_top": space["zone_ranking"][0] if space["zone_ranking"] else None,
         "expiring": expiring[:5],
         "saving_estimate_idr": round(saving_idr, 0),
         "saving_note": "避免缺货的毛利挽回（紧急 SKU × 订货量 × 单件毛利）",
     }
+
+
+def _bar_chart(zone_ranking: list) -> str:
+    """分区坪效横向条形图（SVG，Kimi 单色相阶梯）。"""
+    if not zone_ranking:
+        return ""
+    items = zone_ranking[:7]
+    max_v = max(z["margin_per_m2_idr"] for z in items) or 1
+    rows, y = [], 18
+    for i, z in enumerate(items):
+        w = (z["margin_per_m2_idr"] / max_v) * 300
+        a = 0.85 - i * 0.1
+        rows.append(
+            f'<text x="0" y="{y + 11}" font-size="11" fill="#5a6b7d">{html_mod.escape(z["zone_name"])}</text>'
+            f'<rect x="130" y="{y}" width="{w:.0f}" height="14" rx="3" fill="rgba(15,123,61,{max(a, 0.25):.2f})"/>'
+            f'<text x="{135 + w:.0f}" y="{y + 11}" font-size="11" fill="#1a2332" font-variant-numeric="tabular-nums">'
+            f'{z["margin_per_m2_idr"]:,.0f}</text>')
+        y += 22
+    return (f'<svg width="480" height="{y + 4}" viewBox="0 0 480 {y + 4}" '
+            f'xmlns="http://www.w3.org/2000/svg">{"".join(rows)}</svg>')
+
+
+def _priority_donut(orders: list) -> str:
+    """补货优先级环形图：紧急 vs 常规（SVG）。"""
+    urgent = sum(1 for d in orders if d["action"] == "URGENT")
+    normal = sum(1 for d in orders if d["action"] == "ORDER")
+    total = max(urgent + normal, 1)
+    import math as _m
+    frac = urgent / total
+    # 弧长近似：圆周 2πr=100 单位制
+    r, cx, cy = 15.9, 20, 20
+    circ = 2 * _m.pi * r
+    u_len = circ * frac
+    return (f'<svg width="120" height="44" viewBox="0 0 120 44" xmlns="http://www.w3.org/2000/svg">'
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#e5e7eb" stroke-width="6"/>'
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#dc2626" stroke-width="6" '
+            f'stroke-dasharray="{u_len:.1f} {circ:.1f}" stroke-linecap="round" '
+            f'transform="rotate(-90 {cx} {cy})"/>'
+            f'<text x="14" y="24" font-size="10" fill="#1a2332" font-weight="600">{frac * 100:.0f}%</text>'
+            f'<text x="44" y="20" font-size="11" fill="#dc2626">🔴 mendesak {urgent}</text>'
+            f'<text x="44" y="34" font-size="11" fill="#5a6b7d">🟡 biasa {normal}</text></svg>')
+
+
+def _expiry_bars(expiring: list) -> str:
+    """临期倒计时条形图：天数越少条越短色越红。"""
+    if not expiring:
+        return '<p style="font-size:12px;color:#5a6b7d">Tidak ada.</p>'
+    rows, y = [], 16
+    for e in expiring:
+        d = e["days_to_expiry"]
+        w = max(8, 40 - d * 12)
+        color = "#dc2626" if d <= 2 else "#d97706"
+        rows.append(
+            f'<text x="0" y="{y + 11}" font-size="11" fill="#5a6b7d">{html_mod.escape(e["sku_name"][:18])}</text>'
+            f'<rect x="160" y="{y}" width="{w}" height="14" rx="3" fill="{color}"/>'
+            f'<text x="{166 + w}" y="{y + 11}" font-size="11" fill="#1a2332">{d} hari</text>')
+        y += 22
+    return (f'<svg width="360" height="{y + 2}" viewBox="0 0 360 {y + 2}" '
+            f'xmlns="http://www.w3.org/2000/svg">{"".join(rows)}</svg>')
 
 
 def render_text(brief: dict) -> str:
@@ -181,8 +241,10 @@ def render_html(brief: dict) -> str:
 <p>Ringkasan dari kembaran digital toko Anda. Balas <b>OK</b> lewat WhatsApp untuk konfirmasi pesanan.</p>
 <h2>📦 Pesanan minggu ini（{brief['order_summary']['urgent']} mendesak）</h2>
 <table><tr><th></th><th>SKU</th><th class="num">Jumlah</th></tr>{rows}</table>
+<h2>📊 分区坪效（laba / m² / hari）</h2>{_bar_chart(brief.get("zone_ranking", []))}
 <h2>🔄 Susunan rak（what-if）</h2><ul>{whatif}</ul>
-<h2>🥬 Diskon malam ini</h2><ul>{expiring or '<li>Tidak ada barang segar mendekati kedaluwarsa.</li>'}</ul>
+<h2>⚖️ Prioritas pesanan</h2>{_priority_donut(brief["orders"])}
+<h2>🥬 Diskon malam ini</h2>{_expiry_bars(brief["expiring"])}
 <div class="total">💰 Estimasi hemat minggu ini: <b>Rp {brief['saving_estimate_idr']:,.0f}</b>
 <span style="font-size:11px;color:#5a6b7d">（{e(brief['saving_note'])}）</span></div>
 </body></html>"""

@@ -2,16 +2,18 @@ import { Suspense, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Grid, OrbitControls } from '@react-three/drei'
 import type { SeedDoc } from '@/types/seed'
+import type { BizLayer } from '@/lib/biz'
 import { StoreMesh } from './StoreMesh'
 
 interface TwinSceneProps {
   doc: SeedDoc
+  biz: BizLayer
   selectedFixtureId: string | null
   onSelectFixture: (id: string | null) => void
   autoRotate: boolean
 }
 
-export function TwinScene({ doc, selectedFixtureId, onSelectFixture, autoRotate }: TwinSceneProps) {
+export function TwinScene({ doc, biz, selectedFixtureId, onSelectFixture, autoRotate }: TwinSceneProps) {
   const center = useMemo(() => {
     const xs = doc.zones.flatMap((z) => z.polygon.map((p) => p.x))
     const ys = doc.zones.flatMap((z) => z.polygon.map((p) => p.y))
@@ -54,6 +56,7 @@ export function TwinScene({ doc, selectedFixtureId, onSelectFixture, autoRotate 
         <Suspense fallback={null}>
           <StoreMesh
             doc={doc}
+            biz={biz}
             selectedFixtureId={selectedFixtureId}
             onSelectFixture={onSelectFixture}
             autoRotate={autoRotate}

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { Fixture, SeedDoc, Zone } from '@/types/seed'
-import { FIXTURE_TYPE_COLOR, footprintOf, heatColor } from '@/lib/seed'
+import { FIXTURE_TYPE_COLOR, footprintOf } from '@/lib/seed'
+import { zoneBizColor, fmtIDR, type BizLayer } from '@/lib/biz'
 import { ResetIcon } from '@/components/ui/icons'
 
 interface ViewBox {
@@ -12,13 +13,15 @@ interface ViewBox {
 
 interface FloorplanProps {
   doc: SeedDoc
+  biz: BizLayer
   selectedFixtureId: string | null
   onSelectFixture: (id: string | null) => void
 }
 
 const MARGIN = 4
 
-export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: FloorplanProps) {
+export function Floorplan({ doc, biz, selectedFixtureId, onSelectFixture }: FloorplanProps) {
+  const maxRank = Math.max(biz.zones.length - 1, 1)
   const svgRef = useRef<SVGSVGElement>(null)
   const [view, setView] = useState<ViewBox | null>(null)
   const drag = useRef<{ px: number; py: number; start: ViewBox; moved: boolean } | null>(null)
@@ -94,9 +97,9 @@ export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: Floorplan
           <polygon
             key={z.zone_id}
             points={z.polygon.map((p) => `${p.x},${p.y}`).join(' ')}
-            fill={heatColor(z.heat_value, 0.28)}
-            stroke={heatColor(z.heat_value, 0.9)}
-            strokeWidth={0.12}
+            fill={zoneBizColor((biz.zones.find((b) => b.zone.zone_id === z.zone_id)?.rank ?? 0) / maxRank)}
+            stroke="rgba(255,255,255,0.25)"
+            strokeWidth={0.06}
             className="pointer-events-none"
           />
         ))}
@@ -115,7 +118,7 @@ export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: Floorplan
               style={{ fontSize: Math.max(0.6, vb.w / 60), fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}
               opacity={vb.w < fp.width * 1.6 ? 0.75 : 0}
             >
-              {z.zone_name} · {z.heat_value.toFixed(2)}
+              {z.zone_name} · {fmtIDR(biz.zones.find((b) => b.zone.zone_id === z.zone_id)?.marginPerM2 ?? 0)}/㎡
             </text>
           )
         })}
@@ -146,6 +149,20 @@ export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: Floorplan
                 stroke={isSel ? '#f8fafc' : '#0f172a'}
                 strokeWidth={isSel ? 0.12 : 0.05}
               />
+              {biz.fixtures.get(f.fixture_id)?.isBottom && (
+                <rect
+                  x={-f.length_m / 2 - 0.1}
+                  y={-0.45}
+                  width={f.length_m + 0.2}
+                  height={0.9}
+                  rx={0.15}
+                  fill="none"
+                  stroke="#f87171"
+                  strokeWidth={0.06}
+                  opacity={0.9}
+                  pointerEvents="none"
+                />
+              )}
               {isSel && (
                 <rect
                   className="fixture-pulse"
@@ -180,9 +197,9 @@ export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: Floorplan
           {' · '}
           {zoneById.get(selected.zone_id)?.zone_name}
           {' · '}
-          {selected.fixture_type}
-          {' · '}
-          <span className="num">({selected.position_x.toFixed(1)}, {selected.position_y.toFixed(1)})m</span>
+          {fmtIDR(biz.fixtures.get(selected.fixture_id)?.dailyMargin ?? 0)}/hari
+          {' · '}#{((biz.fixtures.get(selected.fixture_id)?.rank ?? 0) + 1)} 毛利
+          {biz.fixtures.get(selected.fixture_id)?.isBottom ? ' · ⚠️ 末位面位' : ''}
         </div>
       )}
 
