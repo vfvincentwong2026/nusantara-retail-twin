@@ -3,6 +3,7 @@ import type { FacingEdit, SeedDoc } from '@/types/seed'
 import { FIXTURE_TYPE_LABEL, ZONE_TYPE_LABEL, formatIDR } from '@/lib/seed'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { DownloadIcon, ResetIcon, GridIcon } from '@/components/ui/icons'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -77,7 +78,10 @@ export function Inspector({ doc, fixtureId, edits, onEdit, onResetEdits, onExpor
     return (
       <Card className="h-full">
         <CardHeader>
-          <CardTitle className="text-sm">货架图编辑器</CardTitle>
+          <CardTitle className="flex items-center gap-1.5 text-sm">
+            <GridIcon className="h-3.5 w-3.5 opacity-70" />
+            货架图编辑器
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>点击平面图上的货架，查看其货架层与陈列面位（Facing）。</p>
@@ -88,9 +92,11 @@ export function Inspector({ doc, fixtureId, edits, onEdit, onResetEdits, onExpor
           {dirtyCount > 0 && (
             <div className="flex gap-2 pt-2">
               <Button size="sm" onClick={onExport}>
-                导出修改后的种子（{dirtyCount} 处）
+                <DownloadIcon className="mr-1.5 h-3.5 w-3.5" />
+                导出修改后的种子（<span className="num">{dirtyCount}</span> 处）
               </Button>
               <Button size="sm" variant="outline" onClick={onResetEdits}>
+                <ResetIcon className="mr-1.5 h-3.5 w-3.5" />
                 放弃修改
               </Button>
             </div>

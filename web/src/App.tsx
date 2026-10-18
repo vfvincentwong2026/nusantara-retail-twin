@@ -5,6 +5,7 @@ import { loadSeed, STORE_SIZES } from '@/lib/seed'
 import { TopBar } from '@/components/TopBar'
 import { Floorplan } from '@/components/Floorplan'
 import { Inspector } from '@/components/Inspector'
+import { MapIcon, CubeIcon, RotateIcon } from '@/components/ui/icons'
 import { Toaster, toast } from 'sonner'
 
 // 3D 视图按需加载（three.js 约 1MB，独立分包）
@@ -77,28 +78,37 @@ export default function App() {
     <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
       <div className="border-b border-slate-800 px-4 py-3">
         <TopBar doc={doc} size={size} loading={loading} error={error} onSwitchSize={setSize} />
-        <div className="mt-2 flex items-center gap-3">
-          <div className="flex rounded-lg border p-0.5">
-            {(['2d', '3d'] as const).map((v) => (
+        <div className="mt-2.5 flex items-center gap-3">
+          <div className="flex rounded-lg border ds-hairline p-0.5">
+            {(
+              [
+                { v: '2d', label: '2D 平面图', Icon: MapIcon },
+                { v: '3d', label: '3D 数字孪生', Icon: CubeIcon },
+              ] as const
+            ).map(({ v, label, Icon }) => (
               <button
                 key={v}
                 onClick={() => setView(v)}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-                  v === view ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-slate-800'
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                  v === view
+                    ? 'bg-foreground text-background'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
-                {v === '2d' ? '2D 平面图' : '3D 数字孪生'}
+                <Icon className="h-3.5 w-3.5" />
+                {label}
               </button>
             ))}
           </div>
           {view === '3d' && (
-            <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground">
               <input
                 type="checkbox"
                 checked={autoRotate}
                 onChange={(e) => setAutoRotate(e.target.checked)}
-                className="accent-sky-400"
+                className="h-3.5 w-3.5 rounded accent-current"
               />
+              <RotateIcon className="h-3.5 w-3.5 opacity-70" />
               自动旋转
             </label>
           )}

@@ -71,5 +71,30 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: 0;
+  }
+  :focus-visible {
+    outline: 1.5px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: hsl(var(--foreground) / 0.18);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
+  }
+}
+
+/* NRT 设计系统 · 对齐 Kimi 规范：双色阶（400/500）、句首大写、tabular-nums */
+@layer utilities {
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+  .ds-hairline {
+    border-color: hsl(var(--border) / 0.6);
   }
 }
