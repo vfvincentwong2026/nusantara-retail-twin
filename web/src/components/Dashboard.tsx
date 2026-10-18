@@ -9,6 +9,7 @@ interface Tx {
   skuName: string
   qty: number
   margin: number
+  zoneName: string
 }
 
 /** 实时经营模拟：按 SKU 速度加权的随机成交，驱动大屏「活」起来（洽谈演示用，接 POS 后替换） */
@@ -20,6 +21,22 @@ function useLiveSim(doc: SeedDoc) {
         .filter((x) => x.s.unit_price > 0),
     [doc],
   )
+  // SKU → 可选分区（经面位 → 货架层 → 货架 → 分区解析）
+  const skuZones = useMemo(() => {
+    const levelFixture = new Map(doc.shelf_levels.map((l) => [l.shelf_level_id, l.fixture_id]))
+    const fixtureZone = new Map(doc.fixtures.map((f) => [f.fixture_id, f.zone_id]))
+    const zoneName = new Map(doc.zones.map((z) => [z.zone_id, z.zone_name]))
+    const m = new Map<string, string[]>()
+    for (const fc of doc.facings) {
+      if (!fc.sku_code) continue
+      const zn = zoneName.get(fixtureZone.get(levelFixture.get(fc.shelf_level_id) ?? '') ?? '')
+      if (!zn) continue
+      const arr = m.get(fc.sku_code) ?? []
+      if (!arr.includes(zn)) arr.push(zn)
+      m.set(fc.sku_code, arr)
+    }
+    return m
+  }, [doc])
   const totalW = skus.reduce((a, x) => a + x.w, 0)
   const pick = () => {
     let r = Math.random() * totalW
@@ -29,7 +46,7 @@ function useLiveSim(doc: SeedDoc) {
     }
     return skus[skus.length - 1]?.s
   }
-  const [sim, setSim] = useState({ todayMargin: 0, txCount: 0, customers: 34, log: [] as Tx[] })
+  const [sim, setSim] = useState({ todayMargin: 0, txCount: 0, customers: 34, log: [] as Tx[], zoneLive: {} as Record<string, number> })
   const idRef = useRef(0)
   useEffect(() => {
     const t = setInterval(() => {
@@ -38,14 +55,17 @@ function useLiveSim(doc: SeedDoc) {
       const rate = sku.gross_margin ?? (sku.unit_price > 0 ? (sku.unit_price - sku.unit_cost) / sku.unit_price : 0)
       const qty = 1 + Math.floor(Math.random() * 3)
       const margin = sku.unit_price * rate * qty
+      const zones = skuZones.get(sku.sku_code)
+      const zoneName = zones?.[Math.floor(Math.random() * (zones?.length ?? 0))] ?? '未分区'
       const now = new Date()
       idRef.current += 1
       setSim((prev) => ({
         todayMargin: prev.todayMargin + margin,
         txCount: prev.txCount + 1,
         customers: Math.max(8, Math.min(120, prev.customers + Math.floor(Math.random() * 9) - 4)),
+        zoneLive: { ...prev.zoneLive, [zoneName]: (prev.zoneLive[zoneName] ?? 0) + margin },
         log: [
-          { id: idRef.current, time: now.toTimeString().slice(0, 8), skuName: sku.sku_name, qty, margin },
+          { id: idRef.current, time: now.toTimeString().slice(0, 8), skuName: sku.sku_name, qty, margin, zoneName },
           ...prev.log,
         ].slice(0, 7),
       }))
@@ -244,10 +264,33 @@ export function Dashboard({
                 <span className="min-w-0 flex-1 truncate text-slate-300">
                   {tx.skuName} <span className="text-slate-500">×{tx.qty}</span>
                 </span>
+                <span
+                  className="max-w-16 shrink-0 truncate text-slate-500"
+                  title={tx.zoneName}
+                >
+                  {tx.zoneName}
+                </span>
                 <span className="num shrink-0 text-emerald-400">+{fmtIDR(tx.margin)}</span>
               </div>
             ))}
           </div>
+          {/* 分区实时进账 Top3 */}
+          {Object.keys(sim.zoneLive).length > 0 && (
+            <div className="mt-2.5 border-t border-slate-800 pt-2">
+              <p className="text-[9px] uppercase tracking-wide text-slate-600">分区实时进账 Top 3</p>
+              <div className="mt-1 space-y-1">
+                {Object.entries(sim.zoneLive)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 3)
+                  .map(([zn, v]) => (
+                    <div key={zn} className="flex items-baseline justify-between text-[11px]">
+                      <span className="truncate text-slate-400">{zn}</span>
+                      <span className="num text-emerald-400/90">{fmtIDR(v)}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="mt-3 flex items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3.5 py-2.5">
