@@ -1,7 +1,60 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FacingEdit, SeedDoc } from '@/types/seed'
 import { computeBiz, fmtIDR, optimizePlan, type BizLayer } from '@/lib/biz'
 import { toast } from 'sonner'
+
+interface Tx {
+  id: number
+  time: string
+  skuName: string
+  qty: number
+  margin: number
+}
+
+/** 实时经营模拟：按 SKU 速度加权的随机成交，驱动大屏「活」起来（洽谈演示用，接 POS 后替换） */
+function useLiveSim(doc: SeedDoc) {
+  const skus = useMemo(
+    () =>
+      doc.skus
+        .map((s) => ({ s, w: (s.abc_class === 'A' ? 14 : s.abc_class === 'B' ? 5.5 : 1.75) * (s.fresh_flag ? 1.15 : 1) }))
+        .filter((x) => x.s.unit_price > 0),
+    [doc],
+  )
+  const totalW = skus.reduce((a, x) => a + x.w, 0)
+  const pick = () => {
+    let r = Math.random() * totalW
+    for (const x of skus) {
+      r -= x.w
+      if (r <= 0) return x.s
+    }
+    return skus[skus.length - 1]?.s
+  }
+  const [sim, setSim] = useState({ todayMargin: 0, txCount: 0, customers: 34, log: [] as Tx[] })
+  const idRef = useRef(0)
+  useEffect(() => {
+    const t = setInterval(() => {
+      const sku = pick()
+      if (!sku) return
+      const rate = sku.gross_margin ?? (sku.unit_price > 0 ? (sku.unit_price - sku.unit_cost) / sku.unit_price : 0)
+      const qty = 1 + Math.floor(Math.random() * 3)
+      const margin = sku.unit_price * rate * qty
+      const now = new Date()
+      idRef.current += 1
+      setSim((prev) => ({
+        todayMargin: prev.todayMargin + margin,
+        txCount: prev.txCount + 1,
+        customers: Math.max(8, Math.min(120, prev.customers + Math.floor(Math.random() * 9) - 4)),
+        log: [
+          { id: idRef.current, time: now.toTimeString().slice(0, 8), skuName: sku.sku_name, qty, margin },
+          ...prev.log,
+        ].slice(0, 7),
+      }))
+    }, 1800)
+    return () => clearInterval(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doc])
+  return sim
+}
 
 /**
  * 经营数据大屏：与 2D/3D 孪生对应的第三视图。
@@ -17,6 +70,12 @@ export function Dashboard({
   onApplyPlan: (edits: Record<string, FacingEdit>) => void
 }) {
   const [busy, setBusy] = useState(false)
+  const sim = useLiveSim(doc)
+  const [clock, setClock] = useState(() => new Date().toTimeString().slice(0, 8))
+  useEffect(() => {
+    const t = setInterval(() => setClock(new Date().toTimeString().slice(0, 8)), 1000)
+    return () => clearInterval(t)
+  }, [])
 
   // 优化预览：直接基于当前 doc 算一遍（含已挂 edits 的商品占位）
   const preview = useMemo(() => {
@@ -36,10 +95,10 @@ export function Dashboard({
     setBusy(false)
   }
 
-  const kpis: { label: string; value: string; accent?: string }[] = [
-    { label: '总日毛利（全店面位）', value: `${fmtIDR(biz.totalDailyMargin)}/hari`, accent: 'text-emerald-400' },
-    { label: '在售 SKU', value: String(new Set(doc.facings.map((f) => f.sku_code)).size - 1) },
-    { label: '面位数', value: String(doc.facings.length) },
+  const kpis: { label: string; value: string; accent?: string; live?: boolean }[] = [
+    { label: '今日实时毛利（模拟 POS）', value: fmtIDR(sim.todayMargin), accent: 'text-emerald-400', live: true },
+    { label: '成交笔数', value: String(sim.txCount), live: true },
+    { label: '当前在店客流', value: `${sim.customers} 人`, live: true },
     { label: '坪效最佳分区', value: biz.zones.find((z) => z.rank === 0)?.zone.zone_name ?? '—' },
     { label: '末位面位（品类内）', value: String(biz.bottomFacingIds.size), accent: 'text-amber-400' },
     {
@@ -68,7 +127,14 @@ export function Dashboard({
       {/* 顶条 */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold tracking-wide">经营数据大屏</h2>
+          <h2 className="flex items-center gap-2 text-sm font-semibold tracking-wide">
+            经营数据大屏
+            <span className="flex items-center gap-1 rounded border border-emerald-500/40 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-medium tracking-widest text-emerald-400">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+              LIVE
+            </span>
+            <span className="num text-[11px] font-normal text-slate-500">{clock}</span>
+          </h2>
           <p className="text-[11px] text-slate-500">数字孪生实时核算 · 坪效 / 品类 / 末位 / 优化</p>
         </div>
         <button
@@ -84,8 +150,11 @@ export function Dashboard({
       <div className="grid grid-cols-3 gap-2 md:grid-cols-6">
         {kpis.map((k) => (
           <div key={k.label} className="rounded-lg border ds-hairline bg-slate-900/60 px-3 py-2.5">
-            <p className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</p>
-            <p className={`num mt-1 text-lg font-semibold ${k.accent ?? 'text-slate-100'}`}>{k.value}</p>
+            <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-slate-500">
+              {k.label}
+              {k.live && <span className="h-1 w-1 animate-pulse rounded-full bg-emerald-400" />}
+            </p>
+            <p key={k.value} className={`num mt-1 animate-pulse text-lg font-semibold ${k.accent ?? 'text-slate-100'}`}>{k.value}</p>
           </div>
         ))}
       </div>
@@ -137,7 +206,7 @@ export function Dashboard({
         </section>
       </div>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-3">
+      <div className="mt-3 grid gap-3 lg:grid-cols-4">
         {/* what-if 前三挪位 */}
         {biz.whatIf.map((w, i) => (
           <div key={w.facing_id} className="rounded-lg border ds-hairline bg-slate-900/60 p-3.5">
@@ -161,9 +230,26 @@ export function Dashboard({
             验证重算增量：+{fmtIDR(Math.max(verifiedDelta, 0))}/hari（重算含热力加权，可能略高于贪心目标值）
           </p>
         </div>
+        {/* 实时流水 */}
+        <div className="rounded-lg border ds-hairline bg-slate-900/60 p-3.5">
+          <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-slate-500">
+            实时流水（模拟 POS）
+            <span className="h-1 w-1 animate-pulse rounded-full bg-emerald-400" />
+          </p>
+          <div className="mt-2 space-y-1.5">
+            {sim.log.length === 0 && <p className="text-[11px] text-slate-600">等待首笔成交…</p>}
+            {sim.log.map((tx) => (
+              <div key={tx.id} className="flex items-baseline gap-2 text-[11px]">
+                <span className="num shrink-0 text-slate-600">{tx.time}</span>
+                <span className="min-w-0 flex-1 truncate text-slate-300">
+                  {tx.skuName} <span className="text-slate-500">×{tx.qty}</span>
+                </span>
+                <span className="num shrink-0 text-emerald-400">+{fmtIDR(tx.margin)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-
-      {/* 末位警示条 */}
       <div className="mt-3 flex items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3.5 py-2.5">
         <span className="text-amber-400">⚠</span>
         <p className="text-xs text-amber-200/90">
