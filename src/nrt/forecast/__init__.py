@@ -20,9 +20,10 @@ from typing import Optional
 
 from nrt.calendar import IndonesiaCalendar, ISLAND_LOGISTICS
 from nrt.model import SKU, StoreProfile
+from nrt.forecast.croston import croston_sba_forecast
 from nrt.forecast.history import CATEGORY_KEY
 
-MODEL_VERSION = "baseline-v0.2"
+MODEL_VERSION = "hybrid-v0.3"  # A/B 类 weekday 均值基线 + C 类 Croston-SBA
 Z_SERVICE = 1.65  # ~95% 服务水平
 
 
@@ -82,13 +83,26 @@ class ForecastEngine:
             for m in self.cal.get_demand_multipliers(self.store.island_region.value, category=cat_key):
                 mults[m["date"]] = m["multiplier"]
 
+        # ABC 分段选型（nrt backtest 回测结论）：C 类长尾 SKU 需求间歇，
+        # 趋势/季节模型被零销量带偏，走 Croston-SBA；A/B 类维持 weekday 均值基线。
+        use_croston = bool(sku.abc_class) and sku.abc_class.value == "C"
+        croston_rate: Optional[float] = None
+        if use_croston:
+            qty_by_day = {d: q for d, q in daily}
+            span = (today - dates[0]).days + 1
+            series = [qty_by_day.get(dates[0] + timedelta(days=i), 0) for i in range(span)]
+            croston_rate = float(croston_sba_forecast(series, horizon_days)[0])
+
         start = today + timedelta(days=1)
         daily_forecast = []
         for i in range(horizon_days):
             d = start + timedelta(days=i)
-            base = dow_mean[d.weekday()] * (overall / max(_mean(dow_mean), 1e-6))
             m = mults.get(d.isoformat(), 1.0)
-            mean = max(base * m * sentiment_multiplier, 0.05)
+            if use_croston:
+                mean = max(croston_rate * m * sentiment_multiplier, 0.05)
+            else:
+                base = dow_mean[d.weekday()] * (overall / max(_mean(dow_mean), 1e-6))
+                mean = max(base * m * sentiment_multiplier, 0.05)
             p90 = mean * (1 + Z_SERVICE * cv)
             daily_forecast.append(
                 {

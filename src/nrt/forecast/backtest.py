@@ -17,6 +17,7 @@ import numpy as np
 
 from nrt.model import SKU, StoreProfile
 from nrt.forecast import ForecastEngine
+from nrt.forecast.croston import croston_sba_forecast
 
 
 def _daily_series(events: list[dict], start: date, days: int) -> np.ndarray:
@@ -47,28 +48,6 @@ def holt_dow_forecast(series: np.ndarray, horizon: int, alpha: float = 0.4,
         raw = level + (h + 1) * trend
         out.append(max(raw * dow_factor[(last_dow + 1 + h) % 7], 0.05))
     return np.array(out)
-
-
-def croston_sba_forecast(series: np.ndarray, horizon: int) -> np.ndarray:
-    """Croston-SBA：间歇性需求专用。非零间隔与非零量的指数平滑，
-    SBA 修正因子 1 - α/2 抵消平滑偏差。"""
-    n = len(series)
-    nonzero = series[series > 0]
-    if len(nonzero) < 2:
-        return np.full(horizon, nonzero[-1] if len(nonzero) else 0.05)
-    alpha = 0.15
-    z = nonzero[0]  # 非零需求大小平滑
-    p = 1.0         # 非零间隔平滑
-    last_idx = -1
-    for i, v in enumerate(series):
-        if v > 0:
-            if last_idx >= 0:
-                gap = i - last_idx
-                p = p + alpha * (gap - p)
-            z = z + alpha * (v - z)
-            last_idx = i
-    rate = max((1 - alpha / 2) * z / max(p, 1.0), 0.05)
-    return np.full(horizon, rate)
 
 
 def mape(actual: np.ndarray, forecast: np.ndarray) -> float:

@@ -61,7 +61,7 @@ class TestForecastContract(unittest.TestCase):
         missing = CONTRACT_KEYS - set(out)
         self.assertFalse(missing, f"契约字段缺失: {missing}")
         self.assertEqual(len(out["horizon"]["daily_forecast"]), 30)
-        self.assertTrue(out["model_version"].startswith("baseline"))
+        self.assertTrue(out["model_version"].startswith("hybrid"))
 
     def test_p90_above_mean(self):
         history = history_for(self.store, self.sku)
@@ -146,3 +146,38 @@ class TestIslandLeadTime(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestHybridModelSelection(unittest.TestCase):
+    """ABC 分段选型：C 类走 Croston-SBA，A 类维持 weekday 基线。"""
+
+    def _history(self, sku, days=120):
+        store = make_store()
+        sim = SalesHistorySimulator(store, [sku], seed=7)
+        return store, sim.generate(days=days, end_date=date(2026, 1, 15))
+
+    def test_c_class_uses_croston_flat_forecast(self):
+        sku = make_sku(cls=ABCClass.C)
+        store, history = self._history(sku)
+        pred = ForecastEngine(store).predict(sku, history, horizon_days=14, today=date(2026, 1, 15))
+        means = [f["demand_mean"] for f in pred["horizon"]["daily_forecast"]]
+        self.assertEqual(pred["model_version"], "hybrid-v0.3")
+        # Croston 输出常数率：无斋月乘数时逐日相等
+        self.assertEqual(len(set(means)), 1)
+        self.assertGreater(means[0], 0)
+
+    def test_a_class_keeps_dow_baseline(self):
+        sku = make_sku(cls=ABCClass.A)
+        store, history = self._history(sku)
+        pred = ForecastEngine(store).predict(sku, history, horizon_days=14, today=date(2026, 1, 15))
+        means = [f["demand_mean"] for f in pred["horizon"]["daily_forecast"]]
+        self.assertEqual(pred["model_version"], "hybrid-v0.3")
+        # weekday 基线：跨周的同一天均值应一致，周内至少两种取值
+        self.assertGreater(len(set(means[:7])), 1)
+
+    def test_contract_unchanged(self):
+        sku = make_sku(cls=ABCClass.C)
+        store, history = self._history(sku)
+        pred = ForecastEngine(store).predict(sku, history, horizon_days=7, today=date(2026, 1, 15))
+        self.assertTrue(CONTRACT_KEYS.issubset(pred.keys()))
+        self.assertGreaterEqual(pred["safety_stock"], 0)
