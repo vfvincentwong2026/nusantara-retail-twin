@@ -207,7 +207,7 @@ nusantara-retail-twin/
 │       ├── forecast/             # 需求预测引擎（Phase 4 接口预留）
 │       ├── replenishment/        # 补货引擎（Phase 5 接口预留）
 │       ├── space/                # 空间-存量优化（Phase 5 接口预留）
-│       ├── lifecycle/            # FEFO / 促销触发（Phase 6 接口预留）
+│       ├── lifecycle/            # FEFO / 促销触发（Phase 6 已落地）
 │       └── sentiment/            # 舆情信号适配器（Phase 6 接口预留）
 ├── web/
 │   ├── floorplan/                # 2D 平面图编辑器
@@ -291,7 +291,7 @@ print(seed.generation_summary)
 | Phase 3 | 3D 数字孪生渲染（500 / 2000 / 5000㎡） | 🔄 进行中（R3F 沙盘 + 2D/3D 联动 ✅，户外场景/动效待做） |
 | Phase 4 | 需求预测引擎（斋月 / Mudik / Harbolnas） | 🔄 进行中（基线引擎 + nrt forecast ✅，Prophet/LightGBM 待接） |
 | Phase 5 | 补货引擎 + 空间-存量 MILP 优化 | 🔄 进行中（补货引擎 + nrt replenish + MILP 优化器 ✅） |
-| Phase 6 | 生命周期管理 + 舆情信号接入 | ⏳ 计划中 |
+| Phase 6 | 生命周期管理 + 舆情信号接入 | 🔄 进行中（lifecycle/sentiment 引擎已落地） |
 | Phase 7 | Cloudflare Pages 部署、文档完善 | ⏳ 计划中 |
 | Phase 8 | 印尼试点、真实数据接入、区域扩展 | ⏳ 计划中 |
 
