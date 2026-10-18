@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { Fixture, SeedDoc, Zone } from '@/types/seed'
 import { FIXTURE_TYPE_COLOR, footprintOf, heatColor } from '@/lib/seed'
+import { ResetIcon } from '@/components/ui/icons'
 
 interface ViewBox {
   x: number
@@ -110,9 +111,9 @@ export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: Floorplan
               x={cx}
               y={cy}
               textAnchor="middle"
-              className="pointer-events-none select-none fill-slate-300"
-              style={{ fontSize: Math.max(0.6, vb.w / 60) }}
-              opacity={vb.w < fp.width * 1.6 ? 1 : 0}
+              className="pointer-events-none select-none fill-white"
+              style={{ fontSize: Math.max(0.6, vb.w / 60), fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}
+              opacity={vb.w < fp.width * 1.6 ? 0.75 : 0}
             >
               {z.zone_name} · {z.heat_value.toFixed(2)}
             </text>
@@ -149,7 +150,7 @@ export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: Floorplan
                 y={0.18}
                 textAnchor="middle"
                 className="pointer-events-none select-none fill-slate-950"
-                style={{ fontSize: 0.42, fontWeight: 700 }}
+                style={{ fontSize: 0.42, fontWeight: 500 }}
               >
                 {f.fixture_label}
               </text>
@@ -160,21 +161,22 @@ export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: Floorplan
 
       {/* 悬浮信息 */}
       {selected && (
-        <div className="pointer-events-none absolute bottom-3 left-3 rounded-md bg-slate-900/85 px-3 py-2 text-xs text-slate-200 backdrop-blur">
-          <span className="font-semibold text-white">{selected.fixture_label}</span>
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg border ds-hairline bg-slate-900/80 px-3 py-2 text-xs text-slate-200 backdrop-blur">
+          <span className="font-medium text-white">{selected.fixture_label}</span>
           {' · '}
           {zoneById.get(selected.zone_id)?.zone_name}
           {' · '}
           {selected.fixture_type}
           {' · '}
-          ({selected.position_x.toFixed(1)}, {selected.position_y.toFixed(1)})m
+          <span className="num">({selected.position_x.toFixed(1)}, {selected.position_y.toFixed(1)})m</span>
         </div>
       )}
 
       <button
         onClick={resetView}
-        className="absolute right-3 top-3 rounded-md bg-slate-800/85 px-3 py-1.5 text-xs text-slate-200 backdrop-blur hover:bg-slate-700"
+        className="absolute right-3 top-3 flex items-center gap-1.5 rounded-lg border ds-hairline bg-slate-900/80 px-3 py-1.5 text-xs text-slate-200 backdrop-blur transition-colors hover:bg-slate-800 hover:text-white"
       >
+        <ResetIcon className="h-3.5 w-3.5" />
         复位视图
       </button>
       <div className="pointer-events-none absolute left-3 top-3 text-[11px] text-slate-500">
