@@ -59,15 +59,17 @@ def backtest(
     table.add_column("分层", style="cyan")
     table.add_column("基线 MAPE", justify="right")
     table.add_column("Holt-DOW MAPE", justify="right")
+    table.add_column("Croston-SBA MAPE", justify="right")
     sm = report["summary"]
     tiers = [("整体", "overall"), ("A 类", "abc_A"), ("B 类", "abc_B"), ("C 类", "abc_C"), ("生鲜", "fresh")]
     for label, key in tiers:
         v = sm.get(key, {})
-        b, c = v.get("baseline_mape"), v.get("challenger_mape")
-        delta = f"{(c - b) * 100:+.1f}pp" if (b is not None and c is not None) else "—"
+        b, c, k = v.get("baseline_mape"), v.get("challenger_mape"), v.get("croston_mape")
+        delta = f"{(k - b) * 100:+.1f}pp" if (b is not None and k is not None) else "—"
         table.add_row(f"{label} (n={v.get('n', 0)})",
                       f"{b * 100:.1f}%" if b is not None else "—",
-                      f"{c * 100:.1f}% ({delta})" if c is not None else "—")
+                      f"{c * 100:.1f}%" if c is not None else "—",
+                      f"{k * 100:.1f}% ({delta})" if k is not None else "—")
     console.print(table)
 
     if output:

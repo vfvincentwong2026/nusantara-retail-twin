@@ -49,6 +49,28 @@ def holt_dow_forecast(series: np.ndarray, horizon: int, alpha: float = 0.4,
     return np.array(out)
 
 
+def croston_sba_forecast(series: np.ndarray, horizon: int) -> np.ndarray:
+    """Croston-SBA：间歇性需求专用。非零间隔与非零量的指数平滑，
+    SBA 修正因子 1 - α/2 抵消平滑偏差。"""
+    n = len(series)
+    nonzero = series[series > 0]
+    if len(nonzero) < 2:
+        return np.full(horizon, nonzero[-1] if len(nonzero) else 0.05)
+    alpha = 0.15
+    z = nonzero[0]  # 非零需求大小平滑
+    p = 1.0         # 非零间隔平滑
+    last_idx = -1
+    for i, v in enumerate(series):
+        if v > 0:
+            if last_idx >= 0:
+                gap = i - last_idx
+                p = p + alpha * (gap - p)
+            z = z + alpha * (v - z)
+            last_idx = i
+    rate = max((1 - alpha / 2) * z / max(p, 1.0), 0.05)
+    return np.full(horizon, rate)
+
+
 def mape(actual: np.ndarray, forecast: np.ndarray) -> float:
     """MAPE，仅在 actual > 0 的样本上计算（避免删失日除零）。"""
     mask = actual > 0
@@ -88,6 +110,7 @@ def backtest_sku(
 
     train_series = _daily_series(train, dates[0], (today - dates[0]).days + 1)
     challenger_fc = holt_dow_forecast(train_series, horizon)
+    croston_fc = croston_sba_forecast(train_series, horizon)
 
     return {
         "sku_id": sku.sku_id,
@@ -95,6 +118,7 @@ def backtest_sku(
         "fresh": bool(sku.fresh_flag),
         "baseline_mape": round(mape(actual, baseline_fc), 4),
         "challenger_mape": round(mape(actual, challenger_fc), 4),
+        "croston_mape": round(mape(actual, croston_fc), 4),
     }
 
 
@@ -106,7 +130,7 @@ def summarize(rows: list[dict]) -> dict:
         return {"n": len(vals), "mape_mean": round(float(np.mean(vals)), 4) if vals else None}
 
     out: dict = {"overall": {"n": len(rows)}}
-    for key in ("baseline_mape", "challenger_mape"):
+    for key in ("baseline_mape", "challenger_mape", "croston_mape"):
         out["overall"][key] = agg(rows, key)["mape_mean"]
     for cls in ("A", "B", "C"):
         sub = [r for r in rows if r["abc_class"] == cls]
@@ -114,11 +138,13 @@ def summarize(rows: list[dict]) -> dict:
             "n": len(sub),
             "baseline_mape": agg(sub, "baseline_mape")["mape_mean"],
             "challenger_mape": agg(sub, "challenger_mape")["mape_mean"],
+            "croston_mape": agg(sub, "croston_mape")["mape_mean"],
         }
     fresh = [r for r in rows if r["fresh"]]
     out["fresh"] = {
         "n": len(fresh),
         "baseline_mape": agg(fresh, "baseline_mape")["mape_mean"],
         "challenger_mape": agg(fresh, "challenger_mape")["mape_mean"],
+        "croston_mape": agg(fresh, "croston_mape")["mape_mean"],
     }
     return out
