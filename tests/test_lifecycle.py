@@ -6,6 +6,7 @@ import unittest
 from datetime import date, timedelta
 
 from nrt.calendar import IndonesiaCalendar
+from nrt.forecast.history import SalesHistorySimulator
 from nrt.lifecycle import LifecycleManager, fefo_allocate
 from nrt.model import SKU, StoreProfile, StoreFormat, IslandRegion, ABCClass
 
@@ -86,3 +87,35 @@ class TestLifecycle(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSentimentAdapter(unittest.TestCase):
+    def setUp(self):
+        from nrt.sentiment import SentimentAdapter
+        self.ad = SentimentAdapter(seed=7)
+
+    def test_signal_shape(self):
+        agg = self.ad.aggregate("方便面", days=30)
+        self.assertTrue(0 <= agg["heat_index"] <= 1)
+        self.assertTrue(-1 <= agg["sentiment_score"] <= 1)
+        self.assertEqual(agg["trust_weight"], 1.5)  # 食品类清真信任权重
+
+    def test_exogenous_multiplier_bounded(self):
+        for cat in ("方便面", "文具", "穆斯林服饰"):
+            agg = self.ad.aggregate(cat, days=30)
+            m = self.ad.exogenous_multiplier(agg)
+            self.assertTrue(0.75 <= m <= 1.25)
+
+    def test_sentiment_raises_forecast(self):
+        """正向热度应抬升预测均值（外生变量生效）。"""
+        from nrt.forecast import ForecastEngine
+        store = make_store()
+        sku = make_sku(cat="方便面", fresh=False, shelf_life=180)
+        engine = ForecastEngine(store)
+        events = SalesHistorySimulator(store, [sku], seed=7).generate(days=150, end_date=date(2026, 10, 16))
+        hist = [e for e in events if e["sku_id"] == sku.sku_id]
+        base = engine.predict(sku, hist, today=date(2026, 10, 16))
+        boosted = engine.predict(sku, hist, today=date(2026, 10, 16), sentiment_multiplier=1.2)
+        b = sum(f["demand_mean"] for f in base["horizon"]["daily_forecast"])
+        s = sum(f["demand_mean"] for f in boosted["horizon"]["daily_forecast"])
+        self.assertGreater(s, b)

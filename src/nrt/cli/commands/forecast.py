@@ -13,6 +13,7 @@ from rich.table import Table
 from nrt.forecast import ForecastEngine, MODEL_VERSION
 from nrt.forecast.history import SalesHistorySimulator
 from nrt.model import StoreSeed
+from nrt.sentiment import SentimentAdapter
 
 console = Console()
 
@@ -25,6 +26,7 @@ def forecast(
     include_ramadan: bool = typer.Option(False, "--include-ramadan", help="启用斋月窗口特征"),
     history_days: int = typer.Option(150, "--history-days", help="合成历史天数（≥90）"),
     today: str = typer.Option("", "--today", help="模拟日期 YYYY-MM-DD（空 = 系统今天）"),
+    sentiment: bool = typer.Option(False, "--sentiment", help="接入舆情信号外生变量"),
     as_json: bool = typer.Option(False, "--json", help="JSON 输出（可管道给 jq）"),
 ) -> None:
     """对门店 SKU 运行需求预测（基线引擎，契约 docs/architecture.md §4.1）。"""
@@ -42,11 +44,17 @@ def forecast(
     events = sim.generate(days=history_days, end_date=sim_date)
 
     results = []
+    adapter = SentimentAdapter(store, seed=42) if sentiment else None
     for target in targets:
         history = [e for e in events if e["sku_id"] == target.sku_id]
+        smult = 1.0
+        if adapter:
+            agg = adapter.aggregate(target.category_name, days=30, end_date=sim_date)
+            smult = adapter.exogenous_multiplier(agg)
         results.append(
             engine.predict(target, history, horizon_days=horizon,
-                           include_ramadan=include_ramadan, today=sim_date)
+                           include_ramadan=include_ramadan, today=sim_date,
+                           sentiment_multiplier=smult)
         )
 
     if as_json:

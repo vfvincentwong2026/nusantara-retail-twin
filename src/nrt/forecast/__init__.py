@@ -45,6 +45,7 @@ class ForecastEngine:
         horizon_days: int = 30,
         include_ramadan: bool = False,
         today: Optional[date] = None,
+        sentiment_multiplier: float = 1.0,
     ) -> dict:
         """单 SKU 预测，输出严格遵循 §4.1 输出契约。"""
         if historical_sales:
@@ -87,7 +88,7 @@ class ForecastEngine:
             d = start + timedelta(days=i)
             base = dow_mean[d.weekday()] * (overall / max(_mean(dow_mean), 1e-6))
             m = mults.get(d.isoformat(), 1.0)
-            mean = max(base * m, 0.05)
+            mean = max(base * m * sentiment_multiplier, 0.05)
             p90 = mean * (1 + Z_SERVICE * cv)
             daily_forecast.append(
                 {
