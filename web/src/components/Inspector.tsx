@@ -3,7 +3,7 @@ import type { FacingEdit, SeedDoc } from '@/types/seed'
 import { FIXTURE_TYPE_LABEL, ZONE_TYPE_LABEL, formatIDR } from '@/lib/seed'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { DownloadIcon, ResetIcon, GridIcon } from '@/components/ui/icons'
+import { DownloadIcon, ResetIcon, GridIcon, EyeIcon, SearchIcon } from '@/components/ui/icons'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -132,7 +132,7 @@ export function Inspector({ doc, fixtureId, edits, onEdit, onResetEdits, onExpor
               <div key={lv.shelf_level_id} className="flex items-center gap-2">
                 <span className="w-14 shrink-0 text-[11px] text-muted-foreground">
                   L{lv.level_number}
-                  {lv.is_eye_level ? ' 👁' : ''}
+                  {lv.is_eye_level && <EyeIcon className='inline h-3 w-3 opacity-70' />}
                 </span>
                 <div className="flex flex-1 gap-0.5">
                   {facings.map((fc) => {
@@ -140,13 +140,14 @@ export function Inspector({ doc, fixtureId, edits, onEdit, onResetEdits, onExpor
                     const code = edited ? edited.sku_code : fc.sku_code
                     const sku = code ? skuByCode.get(code) : null
                     const color = sku ? (CATEGORY_COLOR[sku.category_name] ?? '#64748b') : '#334155'
-                    const isSel = false
                     return (
                       <button
                         key={fc.facing_id}
                         title={`${fc.facing_id}\n${sku?.sku_name ?? '未分配'}`}
-                        className="h-5 flex-1 rounded-sm border border-slate-700 transition-transform hover:scale-125"
-                        style={{ background: color, outline: isSel ? '2px solid #f8fafc' : undefined }}
+                        className={`h-5 flex-1 rounded-[3px] border transition-all hover:scale-125 ${
+                          edited ? 'border-white/80 ring-1 ring-white/40' : 'border-black/30'
+                        }`}
+                        style={{ background: color }}
                         onClick={() =>
                           document.getElementById(`row-${fc.facing_id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                         }
@@ -160,12 +161,15 @@ export function Inspector({ doc, fixtureId, edits, onEdit, onResetEdits, onExpor
         </div>
 
         {/* SKU 搜索 */}
-        <Input
-          placeholder="搜索 SKU 名称 / 编码 / 品类 / 品牌…"
+        <div className="relative">
+          <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="搜索 SKU 名称 / 编码 / 品类 / 品牌…"
           value={skuFilter}
-          onChange={(e) => setSkuFilter(e.target.value)}
-          className="text-xs"
-        />
+            onChange={(e) => setSkuFilter(e.target.value)}
+            className="pl-8 text-xs"
+          />
+        </div>
 
         {/* 面位编辑表 */}
         <div className="space-y-1">

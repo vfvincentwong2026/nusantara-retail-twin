@@ -146,6 +146,20 @@ export function Floorplan({ doc, selectedFixtureId, onSelectFixture }: Floorplan
                 stroke={isSel ? '#f8fafc' : '#0f172a'}
                 strokeWidth={isSel ? 0.12 : 0.05}
               />
+              {isSel && (
+                <rect
+                  className="fixture-pulse"
+                  x={-f.length_m / 2 - 0.18}
+                  y={-0.53}
+                  width={f.length_m + 0.36}
+                  height={1.06}
+                  rx={0.2}
+                  fill="none"
+                  stroke="#f8fafc"
+                  strokeWidth={0.07}
+                  strokeDasharray="0.3 0.18"
+                />
+              )}
               <text
                 y={0.18}
                 textAnchor="middle"

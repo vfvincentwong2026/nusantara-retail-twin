@@ -122,6 +122,24 @@ export function ResetIcon(props: IconProps) {
   )
 }
 
+export function EyeIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  )
+}
+
+export function SearchIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m16 16 4.5 4.5" />
+    </svg>
+  )
+}
+
 export const ICON = {
   store: StoreIcon,
   box: BoxIcon,
@@ -134,4 +152,6 @@ export const ICON = {
   rotate: RotateIcon,
   download: DownloadIcon,
   reset: ResetIcon,
+  eye: EyeIcon,
+  search: SearchIcon,
 }

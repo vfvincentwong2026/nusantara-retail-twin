@@ -98,3 +98,18 @@
     border-color: hsl(var(--border) / 0.6);
   }
 }
+
+/* 2D 选中货架：呼吸描边脉冲 */
+@keyframes facing-pulse {
+  0%,
+  100% {
+    stroke-opacity: 0.9;
+  }
+  50% {
+    stroke-opacity: 0.25;
+  }
+}
+.fixture-pulse {
+  animation: facing-pulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
