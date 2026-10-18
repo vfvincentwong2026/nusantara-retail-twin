@@ -140,3 +140,29 @@ class TestMigrateServe(unittest.TestCase):
             self.assertIsInstance(seeds, list)
         finally:
             srv.shutdown()
+
+
+class TestSpaceReport(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.seed_file = Path(self.tmp.name) / "seed.json"
+        self.seed_file.write_text(
+            json.dumps(SeedGenerator(store_size=500, region="java", seed=7).generate(),
+                       ensure_ascii=False), encoding="utf-8")
+
+    def test_space_report_structure(self):
+        from nrt.space_value import SpaceAnalyzer
+        from nrt.model import StoreSeed
+        doc = StoreSeed.model_validate(json.loads(self.seed_file.read_text(encoding="utf-8")))
+        rep = SpaceAnalyzer(doc).report()
+        self.assertGreater(len(rep["zone_ranking"]), 0)
+        self.assertGreater(rep["zone_ranking"][0]["margin_per_m2_idr"], 0)
+        self.assertEqual(len(rep["what_if_top"]), 3)
+        for w in rep["what_if_top"]:
+            self.assertGreater(w["delta_daily_margin_idr"], 0)
+
+    def test_space_report_cli(self):
+        r = runner.invoke(app, ["space-report", "-s", str(self.seed_file)])
+        self.assertEqual(r.exit_code, 0, r.output)
+        self.assertIn("坪效", r.output)

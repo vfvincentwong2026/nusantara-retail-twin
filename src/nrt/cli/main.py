@@ -19,6 +19,7 @@ from nrt.cli.commands import optimize as optimize_cmd
 from nrt.cli.commands import replenish as replenish_cmd
 from nrt.cli.commands import seed as seed_cmd
 from nrt.cli.commands import serve as serve_cmd
+from nrt.cli.commands import spacereport as spacereport_cmd
 from nrt.cli.commands import simulate as simulate_cmd
 from nrt.cli.commands import synthpos as synthpos_cmd
 from nrt.cli.commands import validate as validate_cmd
@@ -44,7 +45,9 @@ app.command(name="backtest", help="预测精度回测：基线 vs Holt-DOW vs Cr
 app.command(name="migrate", help="种子文件版本迁移（补字段、升 seed_version）")(migrate_cmd.migrate)
 app.command(name="serve", help="本地只读数据服务（agent-bridge 运行时入口）")(serve_cmd.serve)
 
-# CLI 15 令齐备
+app.command(name="space-report", help="空间价值分析：坪效榜/末位面位/挪位增收")(spacereport_cmd.space_report)
+
+# CLI 16 令齐备
 
 
 def main() -> None:
