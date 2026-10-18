@@ -166,3 +166,27 @@ class TestSpaceReport(unittest.TestCase):
         r = runner.invoke(app, ["space-report", "-s", str(self.seed_file)])
         self.assertEqual(r.exit_code, 0, r.output)
         self.assertIn("坪效", r.output)
+
+
+class TestWeeklyBrief(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.seed_file = Path(self.tmp.name) / "seed.json"
+        self.seed_file.write_text(
+            json.dumps(SeedGenerator(store_size=500, region="java", seed=7).generate(),
+                       ensure_ascii=False), encoding="utf-8")
+
+    def test_weekly_brief_outputs(self):
+        r = runner.invoke(app, [
+            "weekly-brief", "-s", str(self.seed_file), "-o", str(self.tmp.name)])
+        self.assertEqual(r.exit_code, 0, r.output)
+        txt = (Path(self.tmp.name) / "brief.txt").read_text(encoding="utf-8")
+        self.assertIn("Laporan mingguan", txt)
+        self.assertIn("Pesanan minggu ini", txt)
+        self.assertIn("Susunan rak", txt)
+        self.assertIn("Estimasi hemat", txt)
+        self.assertTrue((Path(self.tmp.name) / "brief.html").exists())
+        brief = json.loads((Path(self.tmp.name) / "brief.json").read_text(encoding="utf-8"))
+        self.assertGreaterEqual(brief["order_summary"]["need_replenishment"], 1)
+        self.assertGreater(brief["saving_estimate_idr"], 0)
