@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Nusantara Retail Twin — Proposal Pilot untuk Toko Anda</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; max-width: 820px; margin:24px auto; padding:0 28px; line-height:1.5; }
+  .header { border-bottom:3px solid #0f7b3d; padding-bottom:12px; margin-bottom:18px; }
+  .header h1 { margin:0; font-size:24px; color:#0f7b3d; }
+  .header p { margin:4px 0 0; color:#5a6b7d; font-size:13px; }
+  h2 { font-size:16px; color:#0f7b3d; margin:20px 0 8px; }
+  table { border-collapse:collapse; width:100%; margin:10px 0; font-size:14px; }
+  th, td { border:1px solid #cfd8e3; padding:8px 10px; text-align:left; }
+  th { background:#eef6f0; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .gain { color:#0f7b3d; font-weight:600; }
+  .box { background:#f4f8f5; border-left:4px solid #0f7b3d; padding:12px 16px; margin:14px 0; font-size:14px; }
+  .footer { margin-top:24px; font-size:12px; color:#7a8a9a; border-top:1px solid #cfd8e3; padding-top:10px; }
+  @media print { body { margin:0; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Nusantara Retail Twin</h1>
+  <p>Kembaran digital toko Anda — pilot 8 minggu, tanpa biaya, tanpa risiko.</p>
+</div>
+
+<h2>Masalah yang Kami Selesaikan</h2>
+<p>Stok habis saat pelanggan datang. Barang segar terbuang setiap malam. Susunan rak tidak pernah diperbarui berdasarkan data. Kami mensimulasikan toko supermarket 2.000 m² di Jawa dengan data penjualan setahun penuh — dan inilah kondisinya <b>tanpa</b> sistem kami:</p>
+<table>
+  <tr><th>Indikator (hasil simulasi 365 hari)</th><th>Nilai</th></tr>
+  <tr><td>Hari kehabisan stok (SKU-hari)</td><td class="num">138.645 (3,0%)</td></tr>
+  <tr><td>Unit barang segar terbuang</td><td class="num">104.670 (0,33% dari penjualan)</td></tr>
+  <tr><td>Perkiraan nilai barang terbuang</td><td class="num">± Rp 1,2 miliar / tahun*</td></tr>
+</table>
+
+<h2>Yang Berubah Setelah 8 Minggu Pilot</h2>
+<table>
+  <tr><th>Indikator</th><th>Sebelum</th><th>Sesudah (target)</th><th>Perubahan</th></tr>
+  <tr><td>Tingkat kehabisan stok SKU kelas A</td><td class="num">3,0%</td><td class="num">≤ 2,4%</td><td class="gain">−20%</td></tr>
+  <tr><td>Tingkat pembuangan barang segar</td><td class="num">0,33%</td><td class="num">≤ 0,28%</td><td class="gain">−15%</td></tr>
+  <tr><td>Waktu susun ulang rak berbasis data</td><td class="num">tidak pernah</td><td class="num">setiap minggu</td><td class="gain">otomatis</td></tr>
+</table>
+<p style="font-size:12px;color:#5a6b7d">*Asumsi rata-rata harga pokok Rp 11.500/unit. Angka disesuaikan dengan data aktual toko Anda pada minggu ke-2.</p>
+
+<h2>Bagaimana Pilot Berjalan</h2>
+<div class="box">
+<b>Minggu 1–2:</b> kami petakan toko Anda (rak, SKU, pemasok) menjadi model digital — Anda cukup memberi data penjualan dari mesin kasir.<br>
+<b>Minggu 3–4:</b> sistem berjalan diam-diam (shadow mode). Anda tetap memutuskan apa pun.<br>
+<b>Minggu 5–6:</b> saran pemesanan dan susunan rak Anda ikuti bila setuju — target akurasi saran ≥ 70%.<br>
+<b>Minggu 7–8:</b> evaluasi bersama. Lanjut atau berhenti, tanpa kontrak lanjutan.
+</div>
+
+<h2>Yang Kami Butuhkan dari Anda</h2>
+<ul>
+  <li>Data penjualan harian dari mesin kasir (CSV/Excel, kami yang olah)</li>
+  <li>1 jam wawancara awal + daftar rak dan pemasok utama</li>
+  <li>1 orang staf sebagai penghubung (bisa lewat WhatsApp)</li>
+</ul>
+
+<h2>Teknologi di Baliknya</h2>
+<p>Sistem kami adalah <i>digital twin</i> toko Anda: model 3D ruang penjualan, mesin prakiraan permintaan yang memahami kalender Ramadan &amp; mudik, mesin pemesanan otomatis dengan batasan jumlah dus (MOQ), serta pengelolaan tanggal kedaluwarsa (FEFO). Terbuka di GitHub: <b>github.com/vfvincentwong2026/nusantara-retail-twin</b> — live demo: <b>nusantara-retail-twin.pages.dev</b></p>
+
+<div class="footer">
+Kontak pilot: [nama / WhatsApp Anda di sini] · Nusantara Retail Twin · 2026 · Halaman ini dicetak dari hasil simulasi; angka aktual diverifikasi di minggu ke-2 pilot.
+</div>
+</body>
+</html>
