@@ -12,12 +12,16 @@ export function Dashboard({
   doc,
   biz,
   sim,
+  optimized,
   onApplyPlan,
+  onUndoPlan,
 }: {
   doc: SeedDoc
   biz: BizLayer
   sim: LiveSim
+  optimized: boolean
   onApplyPlan: (edits: Record<string, FacingEdit>) => void
+  onUndoPlan: () => void
 }) {
   const [busy, setBusy] = useState(false)
   const [clock, setClock] = useState(() => new Date().toTimeString().slice(0, 8))
@@ -33,6 +37,11 @@ export function Dashboard({
   }, [doc])
 
   const runOptimize = () => {
+    if (optimized) {
+      onUndoPlan()
+      toast.info('已撤销优化，恢复原始摆位（对比模式）')
+      return
+    }
     setBusy(true)
     const edits: Record<string, FacingEdit> = {}
     for (const [facingId, s] of Object.entries(preview.plan)) {
@@ -89,9 +98,13 @@ export function Dashboard({
         <button
           onClick={runOptimize}
           disabled={busy || preview.count === 0}
-          className="flex items-center gap-2 rounded-md bg-emerald-500/15 border border-emerald-500/40 px-3.5 py-1.5 text-xs font-medium text-emerald-300 transition-colors hover:bg-emerald-500/25 disabled:opacity-40"
+          className={`flex items-center gap-2 rounded-md border px-3.5 py-1.5 text-xs font-medium transition-colors disabled:opacity-40 ${
+            optimized
+              ? 'border-amber-500/40 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25'
+              : 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
+          }`}
         >
-          ⚡ 一键智能优化（贪心 MILP）
+          {optimized ? '↩ 撤销优化 · 恢复摆位' : '⚡ 一键智能优化（贪心 MILP）'}
         </button>
       </div>
 

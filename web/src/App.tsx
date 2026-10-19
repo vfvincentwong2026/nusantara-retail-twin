@@ -33,12 +33,42 @@ export default function App() {
   const [selectedFixtureId, setSelectedFixtureId] = useState<string | null>(null)
   const [edits, setEdits] = useState<Record<string, FacingEdit>>({})
   const [fixtureEdits, setFixtureEdits] = useState<Record<string, FixtureEdit>>({})
+  // 智能优化应用/撤销（洽谈时前后对比）
+  const [optBackup, setOptBackup] = useState<Record<string, FacingEdit | null> | null>(null)
+  const [optApplied, setOptApplied] = useState(false)
+
+  const applyPlan = useCallback(
+    (batch: Record<string, FacingEdit>) => {
+      const backup: Record<string, FacingEdit | null> = {}
+      for (const id of Object.keys(batch)) backup[id] = edits[id] ?? null
+      setOptBackup(backup)
+      setEdits((prev) => ({ ...prev, ...batch }))
+      setOptApplied(true)
+    },
+    [edits],
+  )
+  const undoPlan = useCallback(() => {
+    setEdits((prev) => {
+      const next = { ...prev }
+      if (optBackup) {
+        for (const [id, e] of Object.entries(optBackup)) {
+          if (e === null) delete next[id]
+          else next[id] = e
+        }
+      }
+      return next
+    })
+    setOptBackup(null)
+    setOptApplied(false)
+  }, [optBackup])
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
     setSelectedFixtureId(null)
+    setOptBackup(null)
+    setOptApplied(false)
     loadSeed(size)
       .then((d) => {
         if (cancelled) return
@@ -172,7 +202,9 @@ export default function App() {
                 doc={doc}
                 biz={biz}
                 sim={sim}
-                onApplyPlan={(batch) => setEdits((prev) => ({ ...prev, ...batch }))}
+                optimized={optApplied}
+                onApplyPlan={applyPlan}
+                onUndoPlan={undoPlan}
               />
             ) : (
               <Suspense
