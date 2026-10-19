@@ -113,3 +113,35 @@
   animation: facing-pulse 1.6s ease-in-out infinite;
   pointer-events: none;
 }
+
+@keyframes zone-tx-ring {
+  0% { transform: scale(0.35); opacity: 0.95; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+@keyframes zone-tx-core {
+  0% { transform: scale(1); opacity: 0.9; }
+  30% { transform: scale(1.15); opacity: 0.9; }
+  100% { transform: scale(0.6); opacity: 0; }
+}
+@keyframes zone-tx-label {
+  0% { transform: translateY(4px); opacity: 0; }
+  15% { transform: translateY(0); opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.zone-tx-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: zone-tx-ring 1.8s ease-out forwards;
+  pointer-events: none;
+}
+.zone-tx-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: zone-tx-core 1.8s ease-out forwards;
+  pointer-events: none;
+}
+.zone-tx-label {
+  animation: zone-tx-label 1.8s ease-out forwards;
+  pointer-events: none;
+}

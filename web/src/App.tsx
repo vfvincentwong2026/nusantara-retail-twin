@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react
 import type { FacingEdit, FixtureEdit, SeedDoc } from '@/types/seed'
 import { downloadJSON, heatColor } from '@/lib/seed'
 import { computeBiz, facingDelta, fmtIDR, type BizLayer } from '@/lib/biz'
+import { useLiveSim } from '@/lib/liveSim'
 import { loadSeed, STORE_SIZES } from '@/lib/seed'
 import { TopBar } from '@/components/TopBar'
 import { Floorplan } from '@/components/Floorplan'
@@ -98,6 +99,8 @@ export default function App() {
   }, [doc, edits])
   const heatLegend = useMemo(() => [0, 0.25, 0.5, 0.75, 1], [])
   const biz: BizLayer | null = useMemo(() => (doc ? computeBiz(doc) : null), [doc])
+  // 实时经营模拟提升到 App 层：大屏显示流水，2D 平面图同步分区脉冲
+  const sim = useLiveSim(doc)
   // 演示模式：?demo=1 —— 洽谈第一屏（全屏坪效热力 + 挪位增收浮签）
   const demoMode = useMemo(() => new URLSearchParams(window.location.search).get('demo') === '1', [])
 
@@ -163,11 +166,12 @@ export default function App() {
           )}
           {doc && biz ? (
             view === '2d' ? (
-              <Floorplan doc={doc} biz={biz} fixtureEdits={fixtureEdits} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} onMoveFixture={onMoveFixture} />
+              <Floorplan doc={doc} biz={biz} fixtureEdits={fixtureEdits} selectedFixtureId={selectedFixtureId} onSelectFixture={setSelectedFixtureId} onMoveFixture={onMoveFixture} lastTx={sim.log[0] ?? null} />
             ) : view === 'dash' ? (
               <Dashboard
                 doc={doc}
                 biz={biz}
+                sim={sim}
                 onApplyPlan={(batch) => setEdits((prev) => ({ ...prev, ...batch }))}
               />
             ) : (

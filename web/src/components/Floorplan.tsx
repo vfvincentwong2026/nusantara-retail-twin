@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import type { Fixture, FixtureEdit, SeedDoc, Zone } from '@/types/seed'
 import { FIXTURE_TYPE_COLOR, footprintOf } from '@/lib/seed'
 import { zoneBizColor, fmtIDR, type BizLayer } from '@/lib/biz'
+import type { Tx } from '@/lib/liveSim'
 import { ResetIcon } from '@/components/ui/icons'
 
 interface ViewBox {
@@ -18,11 +19,13 @@ interface FloorplanProps {
   selectedFixtureId: string | null
   onSelectFixture: (id: string | null) => void
   onMoveFixture: (id: string, x: number, y: number) => void
+  /** 实时成交流水（来自大屏共享模拟）：成交发生时所在分区闪脉冲 */
+  lastTx?: Tx | null
 }
 
 const MARGIN = 4
 
-export function Floorplan({ doc, biz, fixtureEdits, selectedFixtureId, onSelectFixture, onMoveFixture }: FloorplanProps) {
+export function Floorplan({ doc, biz, fixtureEdits, selectedFixtureId, onSelectFixture, onMoveFixture, lastTx }: FloorplanProps) {
   const [dragPos, setDragPos] = useState<{ id: string; x: number; y: number } | null>(null)
   const fixtureDrag = useRef<{ id: string; startX: number; startY: number; moved: boolean } | null>(null)
   const maxRank = Math.max(biz.zones.length - 1, 1)
@@ -126,6 +129,50 @@ export function Floorplan({ doc, biz, fixtureEdits, selectedFixtureId, onSelectF
             </text>
           )
         })}
+
+        {/* 实时成交脉冲（来自大屏共享模拟） */}
+        {lastTx &&
+          doc.zones
+            .filter((z) => z.zone_name === lastTx.zoneName)
+            .map((z) => {
+              const cx = z.polygon.reduce((s, p) => s + p.x, 0) / z.polygon.length
+              const cy = z.polygon.reduce((s, p) => s + p.y, 0) / z.polygon.length
+              return (
+                <g key={lastTx.id} className="pointer-events-none">
+                  <circle
+                    className="zone-tx-ring"
+                    cx={cx}
+                    cy={cy}
+                    r={vb.w / 16}
+                    fill="none"
+                    stroke="#a7f3d0"
+                    strokeWidth={vb.w / 260}
+                  />
+                  <circle
+                    className="zone-tx-core"
+                    cx={cx}
+                    cy={cy}
+                    r={vb.w / 40}
+                    fill="rgba(52,211,153,0.35)"
+                    stroke="#6ee7b7"
+                    strokeWidth={vb.w / 500}
+                  />
+                  <text
+                    className="zone-tx-label"
+                    x={cx}
+                    y={cy - vb.w / 22}
+                    textAnchor="middle"
+                    fill="#d1fae5"
+                    stroke="#022c22"
+                    strokeWidth={vb.w / 500}
+                    paintOrder="stroke"
+                    style={{ fontSize: Math.max(0.8, vb.w / 42), fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}
+                  >
+                    +{fmtIDR(lastTx.margin)}
+                  </text>
+                </g>
+              )
+            })}
 
         {/* Fixture 层 */}
         {doc.fixtures.map((f: Fixture) => {
