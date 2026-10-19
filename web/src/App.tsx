@@ -188,6 +188,7 @@ export default function App() {
                   selectedFixtureId={selectedFixtureId}
                   onSelectFixture={setSelectedFixtureId}
                   autoRotate={autoRotate}
+                  lastTx={sim.log[0] ?? null}
                 />
               </Suspense>
             )

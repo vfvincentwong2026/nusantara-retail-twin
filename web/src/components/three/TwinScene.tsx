@@ -1,8 +1,10 @@
-import { Suspense, useMemo } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { Grid, OrbitControls } from '@react-three/drei'
-import type { SeedDoc } from '@/types/seed'
-import type { BizLayer } from '@/lib/biz'
+import { Suspense, useMemo, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { Grid, Html, OrbitControls } from '@react-three/drei'
+import * as THREE from 'three'
+import type { SeedDoc, Zone } from '@/types/seed'
+import { fmtIDR, type BizLayer } from '@/lib/biz'
+import type { Tx } from '@/lib/liveSim'
 import { StoreMesh } from './StoreMesh'
 
 interface TwinSceneProps {
@@ -11,9 +13,47 @@ interface TwinSceneProps {
   selectedFixtureId: string | null
   onSelectFixture: (id: string | null) => void
   autoRotate: boolean
+  /** 实时成交流水（与大屏/2D 共享模拟）：成交分区亮脉冲 */
+  lastTx?: Tx | null
 }
 
-export function TwinScene({ doc, biz, selectedFixtureId, onSelectFixture, autoRotate }: TwinSceneProps) {
+/** 分区成交脉冲：扩散环 + 金额浮标，1.8s 生命周期（与 2D 脉冲同节奏） */
+function ZonePulse({ zone, margin, span }: { zone: Zone; margin: number; span: number }) {
+  const ring = useRef<THREE.Mesh>(null)
+  const mat = useRef<THREE.MeshBasicMaterial>(null)
+  const start = useRef(performance.now())
+  const cx = zone.polygon.reduce((s, p) => s + p.x, 0) / zone.polygon.length
+  const cz = zone.polygon.reduce((s, p) => s + p.y, 0) / zone.polygon.length
+  const base = span / 13
+  useFrame(() => {
+    const t = (performance.now() - start.current) / 1800
+    const s = 0.35 + t * 2.9
+    ring.current?.scale.set(s, s, s)
+    if (mat.current) mat.current.opacity = Math.max(0, 0.9 * (1 - t))
+  })
+  return (
+    <group position={[cx, 2.6, cz]}>
+      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[base * 0.82, base, 48]} />
+        <meshBasicMaterial
+          ref={mat}
+          color="#6ee7b7"
+          transparent
+          opacity={0.9}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
+      <Html center position={[0, 1.4, 0]} distanceFactor={span / 7} style={{ pointerEvents: 'none' }}>
+        <div className="num whitespace-nowrap rounded border border-emerald-500/50 bg-emerald-950/85 px-1.5 py-0.5 text-xs font-bold text-emerald-300">
+          +{fmtIDR(margin)}
+        </div>
+      </Html>
+    </group>
+  )
+}
+
+export function TwinScene({ doc, biz, selectedFixtureId, onSelectFixture, autoRotate, lastTx }: TwinSceneProps) {
   const center = useMemo(() => {
     const xs = doc.zones.flatMap((z) => z.polygon.map((p) => p.x))
     const ys = doc.zones.flatMap((z) => z.polygon.map((p) => p.y))
@@ -62,6 +102,12 @@ export function TwinScene({ doc, biz, selectedFixtureId, onSelectFixture, autoRo
             autoRotate={autoRotate}
           />
         </Suspense>
+        {lastTx &&
+          doc.zones
+            .filter((z) => z.zone_name === lastTx.zoneName)
+            .map((z) => (
+              <ZonePulse key={lastTx.id} zone={z} margin={lastTx.margin} span={center.span} />
+            ))}
         <OrbitControls
           target={[center.cx, 0, center.cz]}
           maxPolarAngle={Math.PI / 2.05}
