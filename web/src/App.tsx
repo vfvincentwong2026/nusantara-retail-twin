@@ -1,7 +1,7 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { FacingEdit, FixtureEdit, SeedDoc } from '@/types/seed'
 import { downloadJSON, heatColor } from '@/lib/seed'
-import { computeBiz, facingDelta, fmtIDR, type BizLayer } from '@/lib/biz'
+import { computeBiz, facingDelta, fmtIDR, optimizePlan, type BizLayer } from '@/lib/biz'
 import { useLiveSim } from '@/lib/liveSim'
 import { loadSeed, STORE_SIZES } from '@/lib/seed'
 import { TopBar } from '@/components/TopBar'
@@ -131,8 +131,40 @@ export default function App() {
   const biz: BizLayer | null = useMemo(() => (doc ? computeBiz(doc) : null), [doc])
   // 实时经营模拟提升到 App 层：大屏显示流水，2D 平面图同步分区脉冲
   const sim = useLiveSim(doc)
-  // 演示模式：?demo=1 —— 洽谈第一屏（全屏坪效热力 + 挪位增收浮签）
+  // 演示模式：?demo=1 —— 洽谈第一屏；?demo=1 且带 auto=1 时自动轮播三视图 + 自动优化
   const demoMode = useMemo(() => new URLSearchParams(window.location.search).get('demo') === '1', [])
+  const demoAuto = useMemo(() => demoMode && new URLSearchParams(window.location.search).get('auto') === '1', [demoMode])
+  const DEMO_ORDER: ViewMode[] = ['2d', '3d', 'dash']
+  const demoOptDone = useRef(false)
+  const applyPlanRef = useRef(applyPlan)
+  applyPlanRef.current = applyPlan
+  // 自动轮播：2D → 3D → 大屏，每 8s 一步；轮播到大屏 2.5s 后自动执行智能优化（避开 React effect 清理）
+  useEffect(() => {
+    if (!demoAuto || !doc) return
+    let step = 0
+    setView(DEMO_ORDER[0])
+    const t = setInterval(() => {
+      step += 1
+      const v = DEMO_ORDER[step % DEMO_ORDER.length]
+      setView(v)
+      if (v === 'dash' && !demoOptDone.current) {
+        demoOptDone.current = true
+        setTimeout(() => {
+          const { plan, totalDelta } = optimizePlan(doc)
+          const batch: Record<string, FacingEdit> = {}
+          for (const [fid, s] of Object.entries(plan)) {
+            const fc = doc.facings.find((f) => f.facing_id === fid)
+            batch[fid] = { sku_code: s.sku_code, max_units: fc?.max_units ?? 1 }
+          }
+          if (Object.keys(batch).length) {
+            applyPlanRef.current(batch)
+            toast.success(`演示 · 一键智能优化：+${fmtIDR(totalDelta)}/hari`)
+          }
+        }, 2500)
+      }
+    }, 8000)
+    return () => clearInterval(t)
+  }, [demoAuto, doc])
 
   return (
     <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
@@ -177,7 +209,7 @@ export default function App() {
       </div>
       <div className="flex min-h-0 flex-1 gap-3 p-3">
         <main className="relative min-w-0 flex-1">
-          {doc && biz && demoMode && (
+          {doc && biz && demoMode && view !== 'dash' && (
             <div className="pointer-events-none absolute right-4 top-4 z-10 w-72 space-y-2">
               <div className="rounded-lg border ds-hairline bg-slate-900/85 px-3.5 py-3 backdrop-blur">
                 <p className="text-[11px] text-slate-400">总日毛利（全店面位合计）</p>
@@ -192,6 +224,16 @@ export default function App() {
                   </p>
                 </div>
               ))}
+            </div>
+          )}
+          {doc && biz && demoMode && (
+            <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full border ds-hairline bg-slate-900/85 px-4 py-1.5 text-xs text-slate-200 backdrop-blur">
+              {view === '2d' && '① 空间价值可视化 —— 颜色越亮，每平米越赚钱'}
+              {view === '3d' && '② 数字孪生 —— 货架 1:1 还原，可旋转查看每层陈列'}
+              {view === 'dash' &&
+                (optApplied
+                  ? '③ 智能优化已生效 —— 看底部日毛利增量，点撤销可对比'
+                  : '③ 经营大屏 —— 实时流水 · 品类毛利 · 一键智能优化')}
             </div>
           )}
           {doc && biz ? (
